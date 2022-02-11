@@ -381,6 +381,7 @@ def _decode_crop_and_flip(image_buffer, bbox, num_channels):
   # bounding box. If no box is supplied, then we assume the bounding box is
   # the entire image.
   sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
+      seed=1,
       tf.image.extract_jpeg_shape(image_buffer),
       bounding_boxes=bbox,
       min_object_covered=0.1,
