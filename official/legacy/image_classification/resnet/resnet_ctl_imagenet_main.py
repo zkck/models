@@ -16,6 +16,7 @@
 
 import math
 import os
+import time
 
 # Import libraries
 from absl import app
@@ -86,9 +87,11 @@ def get_num_train_iterations(flags_obj):
 
 def run_notrain(flags_obj):
   dataset = imagenet_preprocessing.input_fn(True, flags_obj.data_dir, flags_obj.batch_size)
+  start = time.perf_counter_ns()
   for batch in dataset:
     for _ in batch:
       pass
+  return time.perf_counter_ns() - start
 
 
 def run(flags_obj):
