@@ -84,6 +84,12 @@ def get_num_train_iterations(flags_obj):
 
   return train_steps, train_epochs, eval_steps
 
+def run_notrain(flags_obj):
+  dataset = imagenet_preprocessing.input_fn(True, flags_obj.data_dir, flags_obj.batch_size)
+  for batch in dataset:
+    for _ in batch:
+      pass
+
 
 def run(flags_obj):
   """Run ResNet ImageNet training and eval loop using custom training loops.
@@ -190,7 +196,7 @@ def run(flags_obj):
 
 def main(_):
   model_helpers.apply_clean(flags.FLAGS)
-  stats = run(flags.FLAGS)
+  stats = run_notrain(flags.FLAGS)
   logging.info('Run stats:\n%s', stats)
 
 
