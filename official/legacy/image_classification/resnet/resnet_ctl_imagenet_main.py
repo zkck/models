@@ -106,11 +106,6 @@ def run(flags_obj):
   keras_utils.set_session_config()
   performance.set_mixed_precision_policy(flags_core.get_tf_dtype(flags_obj))
 
-  # zkck: Enable op determinism
-  tf.keras.utils.set_random_seed(1)
-  tf.config.experimental.enable_op_determinism()
-  logging.info('Enabled op determinism.')
-
   if tf.config.list_physical_devices('GPU'):
     if flags_obj.tf_gpu_thread_mode:
       keras_utils.set_gpu_thread_mode_and_count(
@@ -195,6 +190,10 @@ def run(flags_obj):
 
 
 def main(_):
+  tf.keras.utils.set_random_seed(1)
+  tf.config.experimental.enable_op_determinism()
+  logging.info('Enabled op determinism.')
+
   model_helpers.apply_clean(flags.FLAGS)
   stats = run_notrain(flags.FLAGS)
   logging.info('Run stats:\n%s', stats)
