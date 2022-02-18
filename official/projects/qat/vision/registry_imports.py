@@ -12,16 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""All necessary imports for registration.
-
-Custom models, task, configs, etc need to be imported to registry so they can be
-picked up by the trainer. They can be included in this file so you do not need
-to handle each file separately.
-"""
-
+"""All necessary imports for registration on qat project."""
 # pylint: disable=unused-import
-from official.common import registry_imports
-from official.vision.beta.projects.example import example_config
-from official.vision.beta.projects.example import example_input
-from official.vision.beta.projects.example import example_model
-from official.vision.beta.projects.example import example_task
+from official.projects.qat.vision import configs
+from official.projects.qat.vision.modeling import layers
+from official.projects.qat.vision.tasks import image_classification
+from official.projects.qat.vision.tasks import retinanet
+from official.projects.qat.vision.tasks import semantic_segmentation
