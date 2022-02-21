@@ -193,9 +193,9 @@ def run(flags_obj):
 
 
 def main(_):
-  tf.keras.utils.set_random_seed(1)
-  tf.config.experimental.enable_op_determinism()
-  logging.info('Enabled op determinism.')
+  # tf.keras.utils.set_random_seed(1)
+  # tf.config.experimental.enable_op_determinism()
+  # logging.info('Enabled op determinism.')
 
   model_helpers.apply_clean(flags.FLAGS)
   stats = run_notrain(flags.FLAGS)
