@@ -88,7 +88,8 @@ def get_num_train_iterations(flags_obj):
 def run_notrain(flags_obj):
   dataset = imagenet_preprocessing.input_fn(True, flags_obj.data_dir, flags_obj.batch_size)
   start = time.perf_counter_ns()
-  for batch in dataset:
+  for i, batch in enumerate(dataset):
+    print(f"On batch {i}...")
     for _ in batch:
       pass
   return time.perf_counter_ns() - start
@@ -199,7 +200,7 @@ def main(_):
 
   model_helpers.apply_clean(flags.FLAGS)
   stats = run_notrain(flags.FLAGS)
-  logging.info('Run stats:\n%s', stats)
+  logging.info('Run stats:\n%s ns', stats)
 
 
 if __name__ == '__main__':
