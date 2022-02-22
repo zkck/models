@@ -1,5 +1,6 @@
 #!/bin/bash
 cd official/legacy/image_classification/resnet
+
 python3 resnet_ctl_imagenet_main.py \
         --tpu=$TPU_NAME \
         --model_dir=$MODEL_DIR \
