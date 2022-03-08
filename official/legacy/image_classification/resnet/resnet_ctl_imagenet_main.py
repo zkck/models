@@ -31,6 +31,11 @@ from official.modeling import performance
 from official.utils.flags import core as flags_core
 from official.utils.misc import keras_utils
 from official.utils.misc import model_helpers
+# zkck: Enable op determinism
+tf.keras.utils.set_random_seed(1)
+tf.config.experimental.enable_op_determinism()
+logging.info('Enabled op determinism.')
+
 
 flags.DEFINE_boolean(name='use_tf_function', default=True,
                      help='Wrap the train and test step inside a '
@@ -99,11 +104,6 @@ def run(flags_obj):
   """
   keras_utils.set_session_config()
   performance.set_mixed_precision_policy(flags_core.get_tf_dtype(flags_obj))
-
-  # zkck: Enable op determinism
-  tf.keras.utils.set_random_seed(1)
-  tf.config.experimental.enable_op_determinism()
-  logging.info('Enabled op determinism.')
 
   if tf.config.list_physical_devices('GPU'):
     if flags_obj.tf_gpu_thread_mode:
