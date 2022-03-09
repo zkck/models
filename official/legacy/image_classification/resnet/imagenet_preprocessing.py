@@ -42,24 +42,12 @@ import tensorflow as tf
 
 DEFAULT_IMAGE_SIZE = 224
 NUM_CHANNELS = 3
+NUM_CLASSES = 1001
 
-def num_classes(flags_obj):
-  if flags_obj.tiny:
-    return 200
-  else:
-    return 1001
-
-def num_images(flags_obj):
-  if flags_obj.tiny:
-    return {
-      'train': 100000,
-      'validation': 10000
-    }
-  else:
-    return {
-      'train': 1281167,
-      'validation': 50000,
-    }
+NUM_IMAGES = {
+    'train': 1281167,
+    'validation': 50000,
+}
 
 _NUM_TRAIN_FILES = 1024
 _SHUFFLE_BUFFER = 10000
