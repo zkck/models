@@ -42,11 +42,11 @@ import tensorflow as tf
 
 DEFAULT_IMAGE_SIZE = 224
 NUM_CHANNELS = 3
-NUM_CLASSES = 1001
+NUM_CLASSES = 200
 
 NUM_IMAGES = {
-    'train': 1281167,
-    'validation': 50000,
+    'train': 100000,
+    'validation': 10000,
 }
 
 _NUM_TRAIN_FILES = 1024
