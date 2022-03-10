@@ -16,4 +16,3 @@ python3 resnet_ctl_imagenet_main.py \
         --log_steps=50 \
         --single_l2_loss_op=true \
         --use_tf_function=true \
-	--tiny
