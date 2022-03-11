@@ -5,8 +5,8 @@ for i in {1..10}
 do
 	python3 resnet_ctl_imagenet_main.py \
 		--tpu=$TPU_NAME \
-		--model_dir=$MODEL_DIR \
-		--data_dir=$DATA_DIR/run$i \
+		--model_dir=$MODEL_DIR/run$i \
+		--data_dir=$DATA_DIR \
 		--batch_size=1024 \
 		--steps_per_loop=500 \
 		--train_epochs=20 \
