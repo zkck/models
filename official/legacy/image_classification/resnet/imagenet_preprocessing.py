@@ -40,7 +40,7 @@ import os
 from absl import logging
 import tensorflow as tf
 
-DEFAULT_IMAGE_SIZE = 224
+DEFAULT_IMAGE_SIZE = 64
 NUM_CHANNELS = 3
 NUM_CLASSES = 200
 
