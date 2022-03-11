@@ -323,7 +323,7 @@ def get_synth_data(height, width, num_channels, num_classes, dtype):
 
   """
   # Synthetic input should be within [0, 255].
-  inputs = tf.random.truncated_normal([height, width, num_channels],
+  inputs = tf.random.stateless_truncated_normal([height, width, num_channels],
                                       dtype=dtype,
                                       mean=127,
                                       stddev=60,
