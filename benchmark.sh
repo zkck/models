@@ -1,7 +1,7 @@
 #!/bin/bash
 cd official/legacy/image_classification/resnet
 
-for i in {1..3}
+for i in {1..5}
 do
 	python3 resnet_ctl_imagenet_main.py \
 		--tpu=$TPU_NAME \
@@ -9,7 +9,7 @@ do
 		--data_dir=$DATA_DIR \
 		--batch_size=1024 \
 		--steps_per_loop=500 \
-		--train_epochs=10 \
+		--train_epochs=20 \
 		--use_synthetic_data=false \
 		--dtype=fp32 \
 		--enable_eager=true \
