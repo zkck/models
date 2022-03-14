@@ -31,9 +31,9 @@ from official.modeling import performance
 from official.utils.flags import core as flags_core
 from official.utils.misc import keras_utils
 from official.utils.misc import model_helpers
-tf.keras.utils.set_random_seed(1)
-tf.config.experimental.enable_op_determinism()
-logging.info('Enabled op determinism.')
+# tf.keras.utils.set_random_seed(1)
+# tf.config.experimental.enable_op_determinism()
+# logging.info('Enabled op determinism.')
 
 flags.DEFINE_boolean(name='use_tf_function', default=True,
                      help='Wrap the train and test step inside a '
