@@ -41,7 +41,7 @@ def _gen_l2_regularizer(use_l2_regularizer=True, l2_weight_decay=1e-4):
 class DeterministicInitializer(keras.initializers.Initializer):
 
   def __init__(self, seed=1):
-    self.seed = tf.constant([[seed]])
+    self.seed = tf.constant([seed, seed])
 
   def __call__(self, shape, dtype=None):
     return tf.random.stateless_truncated_normal(shape, self.seed, dtype=dtype)
