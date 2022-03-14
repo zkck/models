@@ -28,6 +28,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+from tensorflow import keras
 from official.legacy.image_classification.resnet import imagenet_preprocessing
 
 layers = tf.keras.layers
@@ -37,6 +38,13 @@ def _gen_l2_regularizer(use_l2_regularizer=True, l2_weight_decay=1e-4):
   return tf.keras.regularizers.L2(
       l2_weight_decay) if use_l2_regularizer else None
 
+class DeterministicInitializer(keras.initializers.Initializer):
+
+  def __init__(self, seed=1):
+    self.seed = seed
+
+  def __call__(self, shape, dtype=None):
+    return tf.random.stateless_truncated_normal(shape, self.seed, dtype=dtype)
 
 def identity_block(input_tensor,
                    kernel_size,
@@ -72,7 +80,7 @@ def identity_block(input_tensor,
   x = layers.Conv2D(
       filters1, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -89,7 +97,7 @@ def identity_block(input_tensor,
       kernel_size,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2b')(
           x)
@@ -104,7 +112,7 @@ def identity_block(input_tensor,
   x = layers.Conv2D(
       filters3, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2c')(
           x)
@@ -160,7 +168,7 @@ def conv_block(input_tensor,
   x = layers.Conv2D(
       filters1, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -178,7 +186,7 @@ def conv_block(input_tensor,
       strides=strides,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2b')(
           x)
@@ -193,7 +201,7 @@ def conv_block(input_tensor,
   x = layers.Conv2D(
       filters3, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2c')(
           x)
@@ -208,7 +216,7 @@ def conv_block(input_tensor,
       filters3, (1, 1),
       strides=strides,
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '1')(
           input_tensor)
@@ -274,7 +282,7 @@ def resnet50(num_classes,
       strides=(2, 2),
       padding='valid',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name='conv1')(
           x)
@@ -311,7 +319,7 @@ def resnet50(num_classes,
   x = layers.GlobalAveragePooling2D()(x)
   x = layers.Dense(
       num_classes,
-      kernel_initializer=tf.initializers.random_normal(stddev=0.01, seed=1),
+      kernel_initializer=DeterministicInitializer(),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       bias_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name='fc1000')(
