@@ -23,7 +23,6 @@ from absl import flags
 from absl import logging
 import orbit
 import tensorflow as tf
-from tensorflow import keras
 from official.common import distribute_utils
 from official.legacy.image_classification.resnet import common
 from official.legacy.image_classification.resnet import imagenet_preprocessing
@@ -142,12 +141,10 @@ def run(flags_obj):
       'total steps: %d; Eval %d steps', train_epochs, per_epoch_steps,
       train_epochs * per_epoch_steps, eval_steps)
 
-  # time_callback = keras_utils.TimeHistory(
-  #     flags_obj.batch_size,
-  #     flags_obj.log_steps,
-  #     logdir=flags_obj.model_dir if flags_obj.enable_tensorboard else None)
-  time_callback = keras.callbacks.TensorBoard(
-        logdir=flags_obj.model_dir if flags_obj.enable_tensorboard else None)
+  time_callback = keras_utils.TimeHistory(
+      flags_obj.batch_size,
+      flags_obj.log_steps,
+      logdir=flags_obj.model_dir if flags_obj.enable_tensorboard else None)
   with distribute_utils.get_strategy_scope(strategy):
     runnable = resnet_runnable.ResnetRunnable(flags_obj, time_callback,
                                               per_epoch_steps)
