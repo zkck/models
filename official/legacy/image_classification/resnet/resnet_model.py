@@ -311,7 +311,7 @@ def resnet50(num_classes,
   x = layers.GlobalAveragePooling2D()(x)
   x = layers.Dense(
       num_classes,
-      kernel_initializer=tf.initializers.random_normal(stddev=0.01),
+      kernel_initializer=tf.initializers.random_normal(stddev=0.01, seed=1),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       bias_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name='fc1000')(
