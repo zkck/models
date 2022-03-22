@@ -141,7 +141,10 @@ def run(flags_obj):
       'total steps: %d; Eval %d steps', train_epochs, per_epoch_steps,
       train_epochs * per_epoch_steps, eval_steps)
 
-  time_callback = tf.keras.callbacks.TensorBoard(flags_obj.model_dir if flags_obj.enable_tensorboard else None)
+  time_callback = keras_utils.TimeHistory(
+      flags_obj.batch_size,
+      flags_obj.log_steps,
+      logdir=flags_obj.model_dir if flags_obj.enable_tensorboard else None)
   with distribute_utils.get_strategy_scope(strategy):
     runnable = resnet_runnable.ResnetRunnable(flags_obj, time_callback,
                                               per_epoch_steps)
