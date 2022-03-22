@@ -47,7 +47,7 @@ class BatchTimestamp(object):
         self.batch_index, self.timestamp)
 
 
-class TimeHistory(tf.keras.callbacks.Callback):
+class TimeHistory(tf.callbacks.keras.TensorBoard):
   """Callback for Keras models."""
 
   def __init__(self, batch_size, log_steps, initial_step=0, logdir=None):
@@ -62,7 +62,7 @@ class TimeHistory(tf.keras.callbacks.Callback):
     # TODO(wcromar): remove this parameter and rely on `logs` parameter of
     # on_train_batch_end()
     self.batch_size = batch_size
-    super(TimeHistory, self).__init__()
+    super(TimeHistory, self).__init__(logdir)
     self.log_steps = log_steps
     self.last_log_step = initial_step
     self.steps_before_epoch = initial_step
@@ -71,10 +71,11 @@ class TimeHistory(tf.keras.callbacks.Callback):
 
     global_batch_size_gauge.get_cell().set(batch_size)
 
-    if logdir:
-      self.summary_writer = tf.summary.create_file_writer(logdir)
-    else:
-      self.summary_writer = None
+    # if logdir:
+    #   self.summary_writer = tf.summary.create_file_writer(logdir)
+    # else:
+    #   self.summary_writer = None
+    self.summary_writer = None
 
     # Logs start of step 1 then end of each step based on log_steps interval.
     self.timestamp_log = []
