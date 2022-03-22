@@ -42,7 +42,7 @@ from absl import logging
 from absl import flags
 import tensorflow as tf
 
-flags.DEFINE_boolean('tiny', default=False)
+flags.DEFINE_boolean('tiny', default=False, help="Tiny ImageNet")
 
 def _p(imagenet, tiny):
   return tiny if '--tiny' in sys.argv else imagenet
