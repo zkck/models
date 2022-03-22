@@ -47,7 +47,7 @@ class BatchTimestamp(object):
         self.batch_index, self.timestamp)
 
 
-class TimeHistory(tf.callbacks.keras.TensorBoard):
+class TimeHistory(tf.keras.callbacks.TensorBoard):
   """Callback for Keras models."""
 
   def __init__(self, batch_size, log_steps, initial_step=0, logdir=None):
