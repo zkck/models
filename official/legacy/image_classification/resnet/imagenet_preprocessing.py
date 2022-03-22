@@ -38,19 +38,27 @@ from __future__ import print_function
 import os
 
 from absl import logging
+from absl import flags
 import tensorflow as tf
 
-DEFAULT_IMAGE_SIZE = 64
+
+flags.DEFINE_boolean(name='tiny', default=False,
+                     help='Set parameters for Tiny ImageNet.')
+
+def _p(imagenet, tiny):
+  return tiny if flags.FLAGS.tiny else imagenet
+
+DEFAULT_IMAGE_SIZE = _p(224, 64)
 NUM_CHANNELS = 3
-NUM_CLASSES = 200
+NUM_CLASSES = _p(1001, 200)
 
 NUM_IMAGES = {
-    'train': 100000,
-    'validation': 10000,
+    'train': _p(1281167, 100000),
+    'validation': _p(50000, 10000),
 }
 
-_NUM_TRAIN_FILES = 10
-_NUM_VALIDATION_FILES = 1
+_NUM_TRAIN_FILES = _p(1024, 10)
+_NUM_VALIDATION_FILES = _p(128, 1)
 _SHUFFLE_BUFFER = 10000
 
 _R_MEAN = 123.68
@@ -61,8 +69,7 @@ CHANNEL_MEANS = [_R_MEAN, _G_MEAN, _B_MEAN]
 # The lower bound for the smallest side of the image for aspect-preserving
 # resizing. For example, if an image is 500 x 1000, it will be resized to
 # _RESIZE_MIN x (_RESIZE_MIN * 2).
-_RESIZE_MIN = DEFAULT_IMAGE_SIZE
-
+_RESIZE_MIN = _p(256, DEFAULT_IMAGE_SIZE)
 
 def process_record_dataset(dataset,
                            is_training,
