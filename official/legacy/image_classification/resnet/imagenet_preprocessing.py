@@ -36,17 +36,14 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import sys
 
 from absl import logging
-from absl import flags
 import tensorflow as tf
 
 
-flags.DEFINE_boolean(name='tiny', default=False,
-                     help='Set parameters for Tiny ImageNet.')
-
 def _p(imagenet, tiny):
-  return tiny if flags.FLAGS.tiny else imagenet
+  return tiny if '--tiny' in sys.argv else imagenet
 
 DEFAULT_IMAGE_SIZE = _p(224, 64)
 NUM_CHANNELS = 3
