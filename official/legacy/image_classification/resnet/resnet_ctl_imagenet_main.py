@@ -16,6 +16,7 @@
 
 import math
 import os
+import sys
 
 # Import libraries
 from absl import app
@@ -41,6 +42,8 @@ flags.DEFINE_boolean(name='use_tf_function', default=True,
 flags.DEFINE_boolean(name='single_l2_loss_op', default=False,
                      help='Calculate L2_loss on concatenated weights, '
                      'instead of using Keras per-layer L2 loss.')
+flags.DEFINE_boolean(name='deterministic', default=False, help="enable_op_determinism")
+
 
 
 def build_stats(runnable, time_callback):
@@ -195,4 +198,7 @@ def main(_):
 if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   common.define_keras_flags()
+  if '--deterministic' in sys.argv:
+    tf.keras.utils.set_random_seed(1)
+    tf.config.experimental.enable_op_determinism()
   app.run(main)
