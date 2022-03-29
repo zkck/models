@@ -201,4 +201,5 @@ if __name__ == '__main__':
   if '--deterministic' in sys.argv:
     tf.keras.utils.set_random_seed(1)
     tf.config.experimental.enable_op_determinism()
+    print("enable_op_determinism")
   app.run(main)
