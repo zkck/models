@@ -9,7 +9,7 @@ do
             --data_dir=$DATA_DIR \
             --batch_size=1024 \
             --steps_per_loop=500 \
-            --train_epochs=90 \
+            --train_epochs=$TRAIN_EPOCHS \
             --use_synthetic_data=false \
             --dtype=fp32 \
             --enable_eager=true \
