@@ -199,6 +199,7 @@ if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   common.define_keras_flags()
   if '--deterministic' in sys.argv:
+    print("Enabled op determinism.")
     tf.keras.utils.set_random_seed(1)
     tf.config.experimental.enable_op_determinism()
     print("enable_op_determinism")
