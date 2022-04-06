@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# DATA_DIR is the root of the test data
+# DATA_DIR is the inherited by top-level script,
+# it's the root directory of the test data
 IMAGENET_DIR=$DATA_DIR/imagenet2012/tfrecords
 TRAIN_EPOCHS=90
 
