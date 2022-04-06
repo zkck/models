@@ -43,10 +43,10 @@ import tensorflow as tf
 
 NUM_CHANNELS = 3
 
-flags.DEFINE_list('num_images', [], "Two comma-separated values for the number of training and validation images", required=True)
+flags.DEFINE_list('num_images', None, "Two comma-separated values for the number of training and validation images", required=True)
 flags.register_validator('num_images', lambda l: len(l) == 2)
-flags.DEFINE_integer('num_classes', -1, "Number of classes", required=True)
-flags.DEFINE_integer('default_image_size', -1, "Defualt image size", required=True)
+flags.DEFINE_integer('num_classes', None, "Number of classes", required=True)
+flags.DEFINE_integer('default_image_size', None, "Defualt image size", required=True)
 
 
 def num_images():
