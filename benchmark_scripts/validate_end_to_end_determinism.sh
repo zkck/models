@@ -3,9 +3,13 @@
 # DATA_DIR is the inherited by top-level script,
 # it's the root directory of the test data
 IMAGENET_DIR=$DATA_DIR/imagenet2012/tfrecords
+
 TRAIN_EPOCHS=90
+
 NUM_IMAGES=1281167,50000
 NUM_CLASSES=1001
+
+DEFAULT_IMAGE_SIZE=224
 
 for arg in "$@"
 do
@@ -16,6 +20,7 @@ do
         TRAIN_EPOCHS=20
         NUM_IMAGES=100000,10000
         NUM_CLASSES=200
+        DEFAULT_IMAGE_SIZE=64
     fi
 done
 
@@ -41,6 +46,7 @@ args=(
     "--use_tf_function=true"
     "--num_images=$NUM_IMAGES"
     "--num_classes=$NUM_CLASSES"
+    "--default_image_size=$DEFAULT_IMAGE_SIZE"
 )
 echo "Using ${args[@]}"
 
