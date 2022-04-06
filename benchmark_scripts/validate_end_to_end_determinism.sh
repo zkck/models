@@ -39,6 +39,7 @@ args=(
     "--use_tf_function=true"
     "--num_images=$NUM_IMAGES"
 )
+echo "Using ${args[@]}"
 
 cd official/legacy/image_classification/resnet
 
