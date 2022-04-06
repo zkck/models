@@ -8,6 +8,7 @@ for arg in "$@"
 do
     if [ "$arg" == "--test" ]
     then
+        echo "Using Tiny ImageNet, and reducing number of epochs."
         IMAGENET_DIR=$DATA_DIR/imagenet-tiny/tfrecords
         TRAIN_EPOCHS=20
     fi
