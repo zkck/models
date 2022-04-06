@@ -40,6 +40,10 @@ import os
 from absl import logging
 import tensorflow as tf
 
+from official.legacy.image_classification import augment
+
+AUGMENTER = augment.RandAugment()
+
 DEFAULT_IMAGE_SIZE = 224
 NUM_CHANNELS = 3
 NUM_CLASSES = 1001
@@ -563,6 +567,8 @@ def preprocess_image(image_buffer,
     # For training, we want to randomize some of the distortions.
     image = _decode_crop_and_flip(image_buffer, bbox, num_channels)
     image = _resize_image(image, output_height, output_width)
+    # add augmentation
+    image = AUGMENTER.distort(image)
   else:
     # For validation, we want to decode, resize, then just crop the middle.
     image = tf.image.decode_jpeg(image_buffer, channels=num_channels)
