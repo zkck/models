@@ -148,9 +148,10 @@ def get_filenames(is_training, data_dir):
     filenames = data.glob('train/train-*-of-*')
   else:
     filenames = data.glob('validation/validation-*-of-*')
+  filenames = list(filenames)
   if not filenames:
     raise OSError(data)
-  return filenames
+  return sorted(filenames)
 
 
 def parse_example_proto(example_serialized):
