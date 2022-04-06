@@ -17,6 +17,11 @@ do
     fi
 done
 
+function join {
+    local IFS='\n'
+    echo "$*"
+}
+
 args=(
     "--tpu=$TPU_NAME"
     "--model_dir=$MODEL_DIR"
@@ -35,18 +40,14 @@ args=(
     "--num_images=$NUM_IMAGES"
 )
 
-args=$(IFS=\n; echo ${args[*]})
-echo "Using args:"
-echo "$args"
-
 cd official/legacy/image_classification/resnet
 
 for i in {1..5}
 do
-    python3 resnet_ctl_imagenet_main.py "$args" --deterministic
+    python3 resnet_ctl_imagenet_main.py "${args[@]}" --deterministic
 done
 
 for i in {1..5}
 do
-    python3 resnet_ctl_imagenet_main.py "$args"
+    python3 resnet_ctl_imagenet_main.py "${args[@]}"
 done
