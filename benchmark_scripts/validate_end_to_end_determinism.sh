@@ -35,7 +35,7 @@ args=(
     "--num_images=$NUM_IMAGES"
 )
 
-args=$(IFS=\n echo ${args[*]})
+args=$(IFS=\n; echo ${args[*]})
 echo "Using args:"
 echo "$args"
 
