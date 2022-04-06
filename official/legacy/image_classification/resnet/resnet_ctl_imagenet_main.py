@@ -72,14 +72,14 @@ def build_stats(runnable, time_callback):
 def get_num_train_iterations(flags_obj):
   """Returns the number of training steps, train and test epochs."""
   train_steps = (
-      imagenet_preprocessing.NUM_IMAGES['train'] // flags_obj.batch_size)
+      imagenet_preprocessing.num_images()['train'] // flags_obj.batch_size)
   train_epochs = flags_obj.train_epochs
 
   if flags_obj.train_steps:
     train_steps = min(flags_obj.train_steps, train_steps)
     train_epochs = 1
 
-  eval_steps = math.ceil(1.0 * imagenet_preprocessing.NUM_IMAGES['validation'] /
+  eval_steps = math.ceil(1.0 * imagenet_preprocessing.num_images()['validation'] /
                          flags_obj.batch_size)
 
   return train_steps, train_epochs, eval_steps

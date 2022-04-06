@@ -40,7 +40,7 @@ flags.DEFINE_string("export_path", None,
 def export_tfhub(model_path, hub_destination):
   """Restores a tf.keras.Model and saves for TF-Hub."""
   model = resnet_model.resnet50(
-      num_classes=imagenet_preprocessing.NUM_CLASSES, rescale_inputs=True)
+      num_classes=imagenet_preprocessing.num_classes(), rescale_inputs=True)
   model.load_weights(model_path)
   model.save(
       os.path.join(hub_destination, "classification"), include_optimizer=False)

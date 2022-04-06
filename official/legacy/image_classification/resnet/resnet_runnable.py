@@ -48,22 +48,22 @@ class ResnetRunnable(orbit.StandardTrainer, orbit.StandardEvaluator):
 
     if self.flags_obj.use_synthetic_data:
       self.input_fn = common.get_synth_input_fn(
-          height=imagenet_preprocessing.DEFAULT_IMAGE_SIZE,
-          width=imagenet_preprocessing.DEFAULT_IMAGE_SIZE,
+          height=imagenet_preprocessing.default_image_size(),
+          width=imagenet_preprocessing.default_image_size(),
           num_channels=imagenet_preprocessing.NUM_CHANNELS,
-          num_classes=imagenet_preprocessing.NUM_CLASSES,
+          num_classes=imagenet_preprocessing.num_classes(),
           dtype=self.dtype,
           drop_remainder=True)
     else:
       self.input_fn = imagenet_preprocessing.input_fn
 
     self.model = resnet_model.resnet50(
-        num_classes=imagenet_preprocessing.NUM_CLASSES,
+        num_classes=imagenet_preprocessing.num_classes(),
         use_l2_regularizer=not flags_obj.single_l2_loss_op)
 
     lr_schedule = common.PiecewiseConstantDecayWithWarmup(
         batch_size=flags_obj.batch_size,
-        epoch_size=imagenet_preprocessing.NUM_IMAGES['train'],
+        epoch_size=imagenet_preprocessing.num_images()['train'],
         warmup_epochs=common.LR_SCHEDULE[0][1],
         boundaries=list(p[1] for p in common.LR_SCHEDULE[1:]),
         multipliers=list(p[0] for p in common.LR_SCHEDULE),

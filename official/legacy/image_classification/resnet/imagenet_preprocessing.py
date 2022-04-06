@@ -35,21 +35,29 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import pathlib
 
 from absl import logging
+from absl import flags
 import tensorflow as tf
 
-DEFAULT_IMAGE_SIZE = 224
 NUM_CHANNELS = 3
-NUM_CLASSES = 1001
 
-NUM_IMAGES = {
-    'train': 1281167,
-    'validation': 50000,
-}
+flags.DEFINE_list('num_images', help="Two comma-separated values for the number of training and validation images", required=True)
+flags.register_validator('num_images', lambda l: len(l) == 2)
+flags.DEFINE_integer('num_classes', help="Number of classes", required=True)
+flags.DEFINE_integer('default_image_size', required=True)
 
-_NUM_TRAIN_FILES = 1024
+
+def num_images():
+  return {'train': flags.FLAGS.num_images[0], 'validation': flags.FLAGS.num_images[1]}
+
+def default_image_size():
+  return flags.FLAGS.default_image_size
+
+def num_classes():
+  return flags.FLAGS.num_classes
+
 _SHUFFLE_BUFFER = 10000
 
 _R_MEAN = 123.68
@@ -132,16 +140,14 @@ def process_record_dataset(dataset,
 
 def get_filenames(is_training, data_dir):
   """Return filenames for dataset."""
+  data = pathlib.Path(data_dir)
   if is_training:
-    return [
-        os.path.join(data_dir, 'train-%05d-of-01024' % i)
-        for i in range(_NUM_TRAIN_FILES)
-    ]
+    filenames = data.glob('train/train-*-of-*')
   else:
-    return [
-        os.path.join(data_dir, 'validation-%05d-of-00128' % i)
-        for i in range(128)
-    ]
+    filenames = data.glob('validation/validation-*-of-*')
+  if not filenames:
+    raise OSError(data)
+  return filenames
 
 
 def parse_example_proto(example_serialized):
@@ -237,8 +243,8 @@ def parse_record(raw_record, is_training, dtype):
   image = preprocess_image(
       image_buffer=image_buffer,
       bbox=bbox,
-      output_height=DEFAULT_IMAGE_SIZE,
-      output_width=DEFAULT_IMAGE_SIZE,
+      output_height=flags.FLAGS.default_image_size,
+      output_width=flags.FLAGS.default_image_size,
       num_channels=NUM_CHANNELS,
       is_training=is_training)
   image = tf.cast(image, dtype)
@@ -326,7 +332,7 @@ def input_fn(is_training,
 
   if is_training:
     # Shuffle the input files
-    dataset = dataset.shuffle(buffer_size=_NUM_TRAIN_FILES)
+    dataset = dataset.shuffle(buffer_size=_SHUFFLE_BUFFER)
 
   # Convert to individual records.
   # cycle_length = 10 means that up to 10 files will be read and deserialized in
