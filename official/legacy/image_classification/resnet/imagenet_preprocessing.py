@@ -44,13 +44,14 @@ import tensorflow as tf
 NUM_CHANNELS = 3
 
 flags.DEFINE_list('num_images', None, "Two comma-separated values for the number of training and validation images", required=True)
-flags.register_validator('num_images', lambda l: len(l) == 2)
+flags.register_validator('num_images', lambda l: len(l) == 2 and all(map(str.isdigit, l)))
 flags.DEFINE_integer('num_classes', None, "Number of classes", required=True)
-flags.DEFINE_integer('default_image_size', None, "Defualt image size", required=True)
+flags.DEFINE_integer('default_image_size', None, "Default image size", required=True)
+flags.DEFINE_integer('resize_min', None, "Lower bound for resizing", required=True)
 
 
 def num_images():
-  train, validation = flags.FLAGS.num_images
+  train, validation = map(int, flags.FLAGS.num_images)
   return {'train': train, 'validation': validation}
 
 def default_image_size():
@@ -69,7 +70,8 @@ CHANNEL_MEANS = [_R_MEAN, _G_MEAN, _B_MEAN]
 # The lower bound for the smallest side of the image for aspect-preserving
 # resizing. For example, if an image is 500 x 1000, it will be resized to
 # _RESIZE_MIN x (_RESIZE_MIN * 2).
-_RESIZE_MIN = 256
+def resize_min():
+  return flags.FLAGS.resize_min
 
 
 def process_record_dataset(dataset,
@@ -573,7 +575,7 @@ def preprocess_image(image_buffer,
   else:
     # For validation, we want to decode, resize, then just crop the middle.
     image = tf.image.decode_jpeg(image_buffer, channels=num_channels)
-    image = _aspect_preserving_resize(image, _RESIZE_MIN)
+    image = _aspect_preserving_resize(image, resize_min())
     image = _central_crop(image, output_height, output_width)
 
   image.set_shape([output_height, output_width, num_channels])

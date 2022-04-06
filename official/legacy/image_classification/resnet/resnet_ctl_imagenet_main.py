@@ -103,6 +103,7 @@ def run(flags_obj):
   performance.set_mixed_precision_policy(flags_core.get_tf_dtype(flags_obj))
 
   if flags_obj.deterministic:
+    logging.info("Enabled op determinism")
     tf.keras.utils.set_random_seed(1)
     tf.config.experimental.enable_op_determinism()
 

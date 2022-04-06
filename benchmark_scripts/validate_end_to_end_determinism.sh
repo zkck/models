@@ -11,6 +11,8 @@ NUM_CLASSES=1001
 
 DEFAULT_IMAGE_SIZE=224
 
+RESIZE_MIN=256
+
 for arg in "$@"
 do
     if [ "$arg" == "--test" ]
@@ -21,13 +23,10 @@ do
         NUM_IMAGES=100000,10000
         NUM_CLASSES=200
         DEFAULT_IMAGE_SIZE=64
+        RESIZE_MIN=$DEFAULT_IMAGE_SIZE
     fi
 done
 
-function join {
-    local IFS='\n'
-    echo "$*"
-}
 
 args=(
     "--tpu=$TPU_NAME"
@@ -47,6 +46,7 @@ args=(
     "--num_images=$NUM_IMAGES"
     "--num_classes=$NUM_CLASSES"
     "--default_image_size=$DEFAULT_IMAGE_SIZE"
+    "--resize_min=$RESIZE_MIN"
 )
 echo "Using ${args[@]}"
 
