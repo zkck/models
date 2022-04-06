@@ -148,7 +148,7 @@ def get_filenames(is_training, data_dir):
     filenames = data.glob('train/train-*-of-*')
   else:
     filenames = data.glob('validation/validation-*-of-*')
-  filenames = list(filenames)
+  filenames = list(map(str, filenames))
   if not filenames:
     raise OSError(data)
   return sorted(filenames)
