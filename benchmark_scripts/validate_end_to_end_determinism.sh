@@ -35,7 +35,9 @@ args=(
     "--num_images=$NUM_IMAGES"
 )
 
-args=$(IFS=' ' echo ${args[*]})
+args=$(IFS=\n echo ${args[*]})
+echo "Using args:"
+echo "$args"
 
 cd official/legacy/image_classification/resnet
 
