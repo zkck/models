@@ -38,6 +38,8 @@ flags.DEFINE_boolean(name='use_tf_function', default=True,
 flags.DEFINE_boolean(name='single_l2_loss_op', default=False,
                      help='Calculate L2_loss on concatenated weights, '
                      'instead of using Keras per-layer L2 loss.')
+flags.DEFINE_boolean(name='deterministic', default=False,
+                     help='enable_op_determinism')
 
 
 def build_stats(runnable, time_callback):
@@ -99,6 +101,10 @@ def run(flags_obj):
   """
   keras_utils.set_session_config()
   performance.set_mixed_precision_policy(flags_core.get_tf_dtype(flags_obj))
+
+  if flags_obj.deterministic:
+    tf.keras.utils.set_random_seed(1)
+    tf.config.experimental.enable_op_determinism()
 
   if tf.config.list_physical_devices('GPU'):
     if flags_obj.tf_gpu_thread_mode:
