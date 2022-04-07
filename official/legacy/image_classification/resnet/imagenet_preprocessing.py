@@ -41,6 +41,8 @@ from absl import logging
 from absl import flags
 import tensorflow as tf
 
+from official.legacy.image_classification import augment
+
 NUM_CHANNELS = 3
 
 flags.DEFINE_list('num_images', None, "Two comma-separated values for the number of training and validation images", required=True)
@@ -49,6 +51,7 @@ flags.DEFINE_integer('num_classes', None, "Number of classes", required=True)
 flags.DEFINE_integer('default_image_size', None, "Default image size", required=True)
 flags.DEFINE_integer('resize_min', None, "Lower bound for resizing", required=True)
 
+AUGMENTER = augment.RandAugment()
 
 def num_images():
   train, validation = map(int, flags.FLAGS.num_images)
@@ -576,6 +579,7 @@ def preprocess_image(image_buffer,
     # For training, we want to randomize some of the distortions.
     image = _decode_crop_and_flip(image_buffer, bbox, num_channels)
     image = _resize_image(image, output_height, output_width)
+    image = AUGMENTER.distort(image)
   else:
     # For validation, we want to decode, resize, then just crop the middle.
     image = tf.image.decode_jpeg(image_buffer, channels=num_channels)

@@ -30,7 +30,6 @@ done
 
 args=(
     "--tpu=$TPU_NAME"
-    "--model_dir=$MODEL_DIR"
     "--data_dir=$IMAGENET_DIR"
     "--batch_size=1024"
     "--steps_per_loop=500"
@@ -54,10 +53,10 @@ cd official/legacy/image_classification/resnet
 
 for i in {1..5}
 do
-    python3 resnet_ctl_imagenet_main.py "${args[@]}" --deterministic
+    python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR/deterministic$i --deterministic
 done
 
 for i in {1..5}
 do
-    python3 resnet_ctl_imagenet_main.py "${args[@]}"
+    python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR/baseline$i
 done
