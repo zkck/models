@@ -14,6 +14,7 @@
 
 """Helper functions for the Keras implementations of models."""
 
+import dataclasses
 import multiprocessing
 import os
 import time
@@ -35,16 +36,10 @@ first_batch_start_time = first_batch_time_gauge.get_cell('start')
 first_batch_end_time = first_batch_time_gauge.get_cell('end')
 
 
-class BatchTimestamp(object):
-  """A structure to store batch time stamp."""
-
-  def __init__(self, batch_index, timestamp):
-    self.batch_index = batch_index
-    self.timestamp = timestamp
-
-  def __repr__(self):
-    return "'BatchTimestamp<batch_index: {}, timestamp: {}>'".format(
-        self.batch_index, self.timestamp)
+@dataclasses.dataclass
+class BatchTimestamp:
+  batch_index: int
+  timestamp: float
 
 
 class TimeHistory(tf.keras.callbacks.Callback):

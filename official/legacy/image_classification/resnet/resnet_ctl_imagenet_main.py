@@ -14,6 +14,7 @@
 
 """Runs a ResNet model on the ImageNet dataset using custom training loops."""
 
+import dataclasses
 import json
 import math
 import os
@@ -57,15 +58,15 @@ def build_stats(runnable, time_callback):
   stats = {}
 
   if not runnable.flags_obj.skip_eval:
-    stats['eval_loss'] = runnable.test_loss.result().numpy()
-    stats['eval_acc'] = runnable.test_accuracy.result().numpy()
+    stats['eval_loss'] = runnable.test_loss.result().numpy().item()
+    stats['eval_acc'] = runnable.test_accuracy.result().numpy().item()
 
-    stats['train_loss'] = runnable.train_loss.result().numpy()
-    stats['train_acc'] = runnable.train_accuracy.result().numpy()
+    stats['train_loss'] = runnable.train_loss.result().numpy().item()
+    stats['train_acc'] = runnable.train_accuracy.result().numpy().item()
 
   if time_callback:
     timestamp_log = time_callback.timestamp_log
-    stats['step_timestamp_log'] = timestamp_log
+    stats['step_timestamp_log'] = list(map(dataclasses.asdict, timestamp_log))
     stats['train_start_time'] = time_callback.train_start_time
     stats['train_finish_time'] = time_callback.train_finish_time
     if time_callback.epoch_runtime_log:
