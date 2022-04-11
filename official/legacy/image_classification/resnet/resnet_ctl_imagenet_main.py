@@ -14,7 +14,6 @@
 
 """Runs a ResNet model on the ImageNet dataset using custom training loops."""
 
-import json
 import math
 import os
 from pathlib import Path
@@ -198,7 +197,7 @@ def main(_):
   stats = run(flags.FLAGS)
   logging.info('Run stats:\n%s', stats)
   with (Path(flags.FLAGS.model_dir) / "stats.json").open('w') as f:
-    json.dump(stats, f)
+    f.write(str(stats))
 
 
 if __name__ == '__main__':
