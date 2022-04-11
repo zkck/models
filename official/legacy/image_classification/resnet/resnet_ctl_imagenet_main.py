@@ -197,7 +197,7 @@ def main(_):
   model_helpers.apply_clean(flags.FLAGS)
   stats = run(flags.FLAGS)
   logging.info('Run stats:\n%s', stats)
-  with (Path(flags.FLAGS.model_dir) / "stats.json").open() as f:
+  with (Path(flags.FLAGS.model_dir) / "stats.json").open('w') as f:
     json.dump(stats, f)
 
 
