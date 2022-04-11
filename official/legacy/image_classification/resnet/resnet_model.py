@@ -41,7 +41,7 @@ class MyInitializer(tf.keras.initializers.Initializer):
   def __call__(self, shape, dtype=None, **kwargs):
     return self.g.normal(shape, dtype=dtype)
 
-_INITIALIZER = tf.keras.initializers.Zeros()
+_INITIALIZER = MyInitializer(1)
 
 def _gen_l2_regularizer(use_l2_regularizer=True, l2_weight_decay=1e-4):
   return tf.keras.regularizers.L2(
