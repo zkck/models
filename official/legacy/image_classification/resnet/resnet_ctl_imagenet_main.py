@@ -64,6 +64,7 @@ def build_stats(runnable, time_callback):
   if time_callback:
     timestamp_log = time_callback.timestamp_log
     stats['step_timestamp_log'] = timestamp_log
+    stats['train_start_time'] = time_callback.train_start_time
     stats['train_finish_time'] = time_callback.train_finish_time
     if time_callback.epoch_runtime_log:
       stats['avg_exp_per_second'] = time_callback.average_examples_per_second

@@ -109,6 +109,9 @@ class TimeHistory(tf.keras.callbacks.Callback):
   def get_startup_time(self, start_time_sec):
     return self.timestamp_log[0].timestamp - start_time_sec
 
+  def on_train_begin(self, logs=None):
+    self.train_start_time = time.time()
+
   def on_train_end(self, logs=None):
     self.train_finish_time = time.time()
 
