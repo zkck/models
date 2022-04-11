@@ -36,8 +36,4 @@ args=(
 echo "Using ${args[@]}"
 
 cd official/legacy/image_classification/resnet
-
-for i in {1..5}
-do
-    python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR/run$i
-done
+python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR
