@@ -639,7 +639,6 @@ def preprocess_image(image_buffer,
     else:
       image = _decode_crop_and_flip(image_buffer, bbox, num_channels)
     image = _resize_image(image, output_height, output_width)
-    image = AUGMENTER.distort(image)
   else:
     # For validation, we want to decode, resize, then just crop the middle.
     image = tf.image.decode_jpeg(image_buffer, channels=num_channels)
