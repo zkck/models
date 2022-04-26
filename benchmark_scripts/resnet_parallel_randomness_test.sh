@@ -2,31 +2,16 @@
 
 # DATA_DIR is the inherited by top-level script,
 # it's the root directory of the test data
-IMAGENET_DIR=$DATA_DIR/imagenet2012/tfrecords
+IMAGENET_DIR=$DATA_DIR/imagenet-tiny/tfrecords
 
-TRAIN_EPOCHS=90
+TRAIN_EPOCHS=3
 
-NUM_IMAGES=1281167,50000
-NUM_CLASSES=1001
+NUM_IMAGES=100000,10000
+NUM_CLASSES=200
 
-DEFAULT_IMAGE_SIZE=224
+DEFAULT_IMAGE_SIZE=64
 
-RESIZE_MIN=256
-
-for arg in "$@"
-do
-    if [ "$arg" == "--test" ]
-    then
-        echo "Using Tiny ImageNet, and reducing number of epochs."
-        IMAGENET_DIR=$DATA_DIR/imagenet-tiny/tfrecords
-        TRAIN_EPOCHS=20
-        NUM_IMAGES=100000,10000
-        NUM_CLASSES=200
-        DEFAULT_IMAGE_SIZE=64
-        RESIZE_MIN=$DEFAULT_IMAGE_SIZE
-    fi
-done
-
+RESIZE_MIN=$DEFAULT_IMAGE_SIZE
 
 args=(
     "--tpu=$TPU_NAME"
@@ -47,17 +32,10 @@ args=(
     "--default_image_size=$DEFAULT_IMAGE_SIZE"
     "--resize_min=$RESIZE_MIN"
     "--deterministic"
+    "--parallel_randomness"
 )
+
 echo "Using ${args[@]}"
 
 cd official/legacy/image_classification/resnet
-
-for i in {1..5}
-do
-    python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR/parallel$i --parallel_randomness
-done
-
-for i in {1..5}
-do
-    python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR/baseline$i
-done
+python3 resnet_ctl_imagenet_main.py "${args[@]}" --model_dir=$MODEL_DIR
