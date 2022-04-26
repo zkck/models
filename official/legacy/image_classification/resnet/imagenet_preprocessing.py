@@ -125,9 +125,15 @@ def process_record_dataset(dataset,
     dataset = dataset.repeat()
 
   # Parses the raw records into images and labels.
-  dataset = dataset.map(
-      lambda value: parse_record_fn(value, is_training, dtype),
-      num_parallel_calls=tf.data.experimental.AUTOTUNE)
+  if flags.FLAGS.parallel_randomness:
+    dataset = dataset.deterministic().map(
+        lambda value: parse_record_fn(value, is_training, dtype),
+        num_parallel_calls=tf.data.experimental.AUTOTUNE,
+        deterministic_randomness=True)
+  else:
+    dataset = dataset.map(
+        lambda value: parse_record_fn(value, is_training, dtype),
+        num_parallel_calls=tf.data.experimental.AUTOTUNE)
   dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
 
   # Operations between the final prefetch and the get_next call to the iterator
