@@ -22,6 +22,7 @@ import os
 from typing import Any, List, Mapping, Optional, Tuple, Union
 
 from absl import logging
+from absl import flags
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from official.legacy.image_classification import augment
@@ -33,6 +34,10 @@ AUGMENTERS = {
     'randaugment': augment.RandAugment,
 }
 
+flags.DEFINE_bool(
+    'no_ordering',
+    default=False,
+    help='Do not force deterministic ordering on the dataset.')
 
 @dataclasses.dataclass
 class AugmentConfig(base_config.Config):
@@ -326,8 +331,11 @@ class DatasetBuilder:
     if builder is None:
       raise ValueError('Unknown builder type {}'.format(self.config.builder))
 
+    options = tf.data.Options()
+    options.deterministic = not flags.FLAGS.no_ordering
+
     self.input_context = input_context
-    dataset = builder()
+    dataset = builder().with_options(options)
     dataset = self.pipeline(dataset)
 
     return dataset
