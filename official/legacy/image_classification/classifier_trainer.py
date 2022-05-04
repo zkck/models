@@ -15,6 +15,7 @@
 # Lint as: python3
 """Runs an Image Classification model."""
 
+import json
 import os
 import pprint
 from typing import Any, Mapping, Optional, Text, Tuple
@@ -411,6 +412,7 @@ def export(params: base_configs.ExperimentConfig):
   model = get_models()[params.model.name](**model_params)
   checkpoint = params.export.checkpoint
   if checkpoint is None:
+
     logging.info('No export checkpoint was provided. Using the latest '
                  'checkpoint from model_dir.')
     checkpoint = tf.train.latest_checkpoint(params.model_dir)
@@ -443,6 +445,8 @@ def main(_):
   stats = run(flags.FLAGS)
   if stats:
     logging.info('Run stats:\n%s', stats)
+    with open(os.path.join(flags.FLAGS.data_dir, 'stats.json'), 'w') as f:
+      json.dump(stats, f, default=str, indent=2)
 
 
 if __name__ == '__main__':
