@@ -445,7 +445,7 @@ def main(_):
   stats = run(flags.FLAGS)
   if stats:
     logging.info('Run stats:\n%s', stats)
-    with open(os.path.join(flags.FLAGS.data_dir, 'stats.json'), 'w') as f:
+    with open(os.path.join(flags.FLAGS.model_dir, 'stats.json'), 'w') as f:
       json.dump(stats, f, default=str, indent=2)
 
 
