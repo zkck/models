@@ -21,6 +21,8 @@ from typing import List, Optional, Text, Tuple
 import tensorflow as tf
 from official.legacy.image_classification import augment
 
+from absl import flags
+
 
 # Calculated from the ImageNet training set
 MEAN_RGB = (0.485 * 255, 0.456 * 255, 0.406 * 255)
@@ -231,7 +233,8 @@ def decode_crop_and_flip(image_bytes: tf.Tensor) -> tf.Tensor:
       aspect_ratio_range=[0.75, 1.33],
       area_range=[0.05, 1.0],
       max_attempts=100,
-      use_image_if_no_bounding_boxes=True)
+      use_image_if_no_bounding_boxes=True,
+      seed=int(flags.FLAGS.enable_op_determinism))
   bbox_begin, bbox_size, _ = sample_distorted_bounding_box
 
   # Reassemble the bounding box in the format the crop op requires.
