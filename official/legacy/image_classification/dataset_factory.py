@@ -35,9 +35,9 @@ AUGMENTERS = {
 }
 
 flags.DEFINE_bool(
-    'no_ordering',
+    'deterministic_ordering',
     default=False,
-    help='Do not force deterministic ordering on the dataset.')
+    help='Force deterministic ordering on the dataset.')
 
 @dataclasses.dataclass
 class AugmentConfig(base_config.Config):
@@ -332,7 +332,7 @@ class DatasetBuilder:
       raise ValueError('Unknown builder type {}'.format(self.config.builder))
 
     options = tf.data.Options()
-    options.deterministic = not flags.FLAGS.no_ordering
+    options.deterministic = flags.FLAGS.deterministic_ordering
 
     self.input_context = input_context
     dataset = builder().with_options(options)
