@@ -39,6 +39,11 @@ from official.utils import hyperparams_flags
 from official.utils.misc import keras_utils
 
 
+flags.DEFINE_bool(
+  "enable_op_determinism",
+  default=False,
+  help="Call enable_op_determinism in main")
+
 def get_models() -> Mapping[str, tf.keras.Model]:
   """Returns the mapping from model type name to Keras model."""
   return {
@@ -442,6 +447,9 @@ def run(flags_obj: flags.FlagValues,
 
 
 def main(_):
+  if flags.FLAGS.enable_op_determinism:
+    tf.keras.utils.set_random_seed(1)
+    tf.config.experimental.enable_op_determinism()
   stats = run(flags.FLAGS)
   if stats:
     logging.info('Run stats:\n%s', stats)
