@@ -7,7 +7,7 @@ runtime:
 train_dataset:
   name: 'imagenet2012'
   data_dir: null
-  builder: 'tfds'
+  builder: 'records'
   split: 'train'
   one_hot: false
   image_size: 224
@@ -21,7 +21,7 @@ train_dataset:
 validation_dataset:
   name: 'imagenet2012'
   data_dir: null
-  builder: 'tfds'
+  builder: 'records'
   split: 'validation'
   one_hot: false
   image_size: 224
