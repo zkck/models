@@ -2,7 +2,7 @@
 
 cd official/legacy/image_classification
 
-bash python3 classifier_trainer.py \
+python3 classifier_trainer.py \
         --mode=train_and_eval \
         --model_type=resnet \
         --dataset=imagenet \
