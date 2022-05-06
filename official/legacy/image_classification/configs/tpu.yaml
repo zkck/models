@@ -49,7 +49,7 @@ train:
   callbacks:
     enable_checkpoint_and_export: true
   resume_checkpoint: true
-  epochs: 10
+  epochs: 6
   set_epoch_loop: true
 evaluation:
   epochs_between_evals: 1
