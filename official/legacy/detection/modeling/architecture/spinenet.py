@@ -67,7 +67,7 @@ SCALING_MAP = {
         'resample_alpha': 0.5,
         'block_repeats': 1,
     },
-    '49': {
+    49: {
         'endpoints_num_filters': 256,
         'filter_size_scale': 1.0,
         'resample_alpha': 0.5,
