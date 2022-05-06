@@ -11,7 +11,8 @@ architecture:
   multilevel_features: identity
 spinenet:
   model_id: 49
-train_file_pattern: ${TRAIN_FILE_PATTERN?}
+train:
+  train_file_pattern: ${TRAIN_FILE_PATTERN?}
 eval:
   val_json_file: ${VAL_JSON_FILE?}
   eval_file_pattern: ${EVAL_FILE_PATTERN?}
