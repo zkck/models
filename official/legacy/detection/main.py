@@ -178,6 +178,7 @@ def build_stats(time_history):
   stats = {}
   timestamp_log = time_history.timestamp_log
   stats['epoch_runtime_log'] = time_history.epoch_runtime_log
+  stats['batch_runtime_log'] = time_history.batch_runtime_log
   stats['step_timestamp_log'] = timestamp_log
   if time_history.epoch_runtime_log:
     stats['avg_exp_per_second'] = time_history.average_examples_per_second
