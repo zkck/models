@@ -268,7 +268,7 @@ def run(callbacks=None):
 
   if FLAGS.log_steps:
     with Path(FLAGS.model_dir, "stats.json").open('w') as f:
-      json.dump(build_stats(callbacks[0]), f)
+      json.dump(build_stats(callbacks[0]), f, default=str)
 
   return results
 
