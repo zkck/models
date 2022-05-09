@@ -36,8 +36,10 @@ validation_dataset:
   filenames: ['cifar10-test.tfrecord-00000-of-00001']
 model:
   name: 'resnet'
+  num_classes: 10
   model_params:
     rescale_inputs: true
+    num_classes: 10
   optimizer:
     name: 'momentum'
     momentum: 0.9
