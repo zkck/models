@@ -189,6 +189,9 @@ def build_stats(time_history):
 def run(callbacks=None):
   """Runs the experiment."""
   keras_utils.set_session_config(enable_xla=FLAGS.enable_xla)
+  if flags.FLAGS.enable_op_determinism:
+    tf.keras.utils.set_random_seed(1)
+    tf.config.experimental.enable_op_determinism()
 
   params = config_factory.config_generator(FLAGS.model)
 
@@ -275,9 +278,6 @@ def run(callbacks=None):
 
 def main(argv):
   del argv  # Unused.
-  if flags.FLAGS.enable_op_determinism:
-    tf.keras.utils.set_random_seed(1)
-    tf.config.experimental.enable_op_determinism()
   run()
 
 
