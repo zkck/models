@@ -82,6 +82,9 @@ class TimeHistory(tf.keras.callbacks.Callback):
     # Records the time each epoch takes to run from start to finish of epoch.
     self.epoch_runtime_log = []
 
+    # Records the time each batch takes to run from start to finish
+    self.batch_runtime_log = []
+
   @property
   def global_steps(self):
     """The current 1-indexed global step."""
@@ -142,6 +145,7 @@ class TimeHistory(tf.keras.callbacks.Callback):
       examples_per_second = steps_per_second * self.batch_size
 
       self.timestamp_log.append(BatchTimestamp(self.global_steps, now))
+      self.batch_runtime_log.append(elapsed_time)
       logging.info(
           'TimeHistory: %.2f seconds, %.2f examples/second between steps %d '
           'and %d', elapsed_time, examples_per_second, self.last_log_step,
