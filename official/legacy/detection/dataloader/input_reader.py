@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Data loader and input processing."""
+from absl import flags
 
 from __future__ import absolute_import
 from __future__ import division
@@ -79,6 +80,10 @@ class InputFn(object):
     assert batch_size is not None
     dataset = tf.data.Dataset.list_files(
         self._file_pattern, shuffle=self._is_training)
+
+    options = tf.data.Options()
+    options.deterministic = flags.FLAGS.deterministic_ordering
+    dataset = dataset.with_options(options)
 
     if self._input_sharding and ctx and ctx.num_input_pipelines > 1:
       dataset = dataset.shard(ctx.num_input_pipelines, ctx.input_pipeline_id)
