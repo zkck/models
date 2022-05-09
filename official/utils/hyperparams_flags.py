@@ -76,6 +76,19 @@ def define_common_hparams_flags():
                        'Number of steps to save checkpoint.')
 
 
+  flags.DEFINE_bool(
+      "enable_op_determinism",
+      default=False,
+      help="Call enable_op_determinism in main")
+
+  flags.DEFINE_bool(
+      'deterministic_ordering',
+      default=False,
+      help='Force deterministic ordering on the dataset.')
+
+
+
+
 def initialize_common_flags():
   """Define the common flags across models."""
   define_common_hparams_flags()

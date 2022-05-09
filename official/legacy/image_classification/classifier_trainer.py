@@ -39,11 +39,6 @@ from official.utils import hyperparams_flags
 from official.utils.misc import keras_utils
 
 
-flags.DEFINE_bool(
-  "enable_op_determinism",
-  default=False,
-  help="Call enable_op_determinism in main")
-
 def get_models() -> Mapping[str, tf.keras.Model]:
   """Returns the mapping from model type name to Keras model."""
   return {

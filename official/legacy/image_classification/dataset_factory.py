@@ -34,10 +34,6 @@ AUGMENTERS = {
     'randaugment': augment.RandAugment,
 }
 
-flags.DEFINE_bool(
-    'deterministic_ordering',
-    default=False,
-    help='Force deterministic ordering on the dataset.')
 
 @dataclasses.dataclass
 class AugmentConfig(base_config.Config):
