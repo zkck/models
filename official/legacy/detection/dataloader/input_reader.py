@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """Data loader and input processing."""
-from absl import flags
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from absl import flags
 from typing import Optional, Text
 import tensorflow as tf
 from official.legacy.detection.dataloader import factory
