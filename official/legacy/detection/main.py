@@ -15,6 +15,8 @@
 """Main function to train various object detection models."""
 
 import functools
+import json
+from pathlib import Path
 import pprint
 
 from absl import app
@@ -172,6 +174,19 @@ def run_executor(params,
     raise ValueError('Mode not found: %s.' % mode)
 
 
+def build_stats(time_history):
+  stats = {}
+  timestamp_log = time_history.timestamp_log
+  stats['epoch_runtime_log'] = time_history.epoch_runtime_log
+  stats['step_timestamp_log'] = timestamp_log
+  stats['train_finish_time'] = time_history.train_finish_time
+  if time_history.epoch_runtime_log:
+    stats['avg_exp_per_second'] = time_history.average_examples_per_second
+
+  return stats
+
+
+
 def run(callbacks=None):
   """Runs the experiment."""
   keras_utils.set_session_config(enable_xla=FLAGS.enable_xla)
@@ -244,13 +259,19 @@ def run(callbacks=None):
             log_steps=FLAGS.log_steps,
         ))
 
-  return run_executor(
+  results = run_executor(
       params,
       FLAGS.mode,
       checkpoint_path=FLAGS.checkpoint_path,
       train_input_fn=train_input_fn,
       eval_input_fn=eval_input_fn,
       callbacks=callbacks)
+
+  if FLAGS.log_steps:
+    with Path(FLAGS.model_dir, "stats.json").open('w') as f:
+      json.dump(build_stats(callbacks[0]), f)
+
+  return results
 
 
 def main(argv):
