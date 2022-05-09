@@ -275,7 +275,9 @@ def run(callbacks=None):
 
 def main(argv):
   del argv  # Unused.
-
+  if flags.FLAGS.enable_op_determinism:
+    tf.keras.utils.set_random_seed(1)
+    tf.config.experimental.enable_op_determinism()
   run()
 
 
