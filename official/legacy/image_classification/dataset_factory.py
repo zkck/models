@@ -458,10 +458,10 @@ class DatasetBuilder:
       # replicas automatically when strategy.distribute_datasets_from_function
       # is called, so we use local batch size here.
       dataset = dataset.batch(
-          self.local_batch_size, drop_remainder=True)
+          self.local_batch_size, drop_remainder=self.is_training)
     else:
       dataset = dataset.batch(
-          self.global_batch_size, drop_remainder=True)
+          self.global_batch_size, drop_remainder=self.is_training)
 
     # Prefetch overlaps in-feed with training
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)

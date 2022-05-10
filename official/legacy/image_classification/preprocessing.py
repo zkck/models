@@ -29,7 +29,7 @@ MEAN_RGB = (0.485 * 255, 0.456 * 255, 0.406 * 255)
 STDDEV_RGB = (0.229 * 255, 0.224 * 255, 0.225 * 255)
 
 IMAGE_SIZE = 224
-CROP_PADDING = 4
+CROP_PADDING = 8
 
 
 def mean_image_subtraction(
@@ -355,7 +355,7 @@ def build_eval_dataset(filenames: List[Text],
 
   dataset = dataset.map(
       lambda filename, label: (load_eval_image(filename, image_size), label))
-  dataset = dataset.batch(batch_size, drop_remainder=True)
+  dataset = dataset.batch(batch_size)
 
   return dataset
 
