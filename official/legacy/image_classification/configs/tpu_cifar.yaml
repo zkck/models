@@ -14,7 +14,7 @@ train_dataset:
   num_classes: 10
   num_examples: 50000
   batch_size: 64
-  use_per_replica_batch_size: true
+  use_per_replica_batch_size: false
   mean_subtract: false
   standardize: false
   dtype: 'bfloat16'
@@ -29,7 +29,7 @@ validation_dataset:
   num_classes: 10
   num_examples: 10000
   batch_size: 64
-  use_per_replica_batch_size: true
+  use_per_replica_batch_size: false
   mean_subtract: false
   standardize: false
   dtype: 'bfloat16'
