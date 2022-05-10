@@ -519,7 +519,7 @@ class DatasetBuilder:
       'image': tf.io.FixedLenFeature([], tf.string),
     }
     parsed = tf.io.parse_single_example(record, keys_to_features)
-    return tf.io.decode_png(parsed["image"]), parsed["label"]
+    return tf.io.decode_png(parsed["image"], channels=self.config.num_channels), parsed["label"]
 
   def parse_record(self, record: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
     """Parse an ImageNet record from a serialized string Tensor."""
