@@ -484,7 +484,7 @@ class DatasetBuilder:
     try:
       return {
         'cifar10': self._get_bytes_cifar10,
-        'imagenet': self._get_bytes_imagenet
+        'imagenet2012': self._get_bytes_imagenet
       }[self.config.name](record)
     except KeyError:
       raise ValueError("Unknown dataset config name, could not load records.")
