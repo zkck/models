@@ -13,8 +13,8 @@ train_dataset:
   image_size: 32
   num_classes: 10
   num_examples: 50000
-  batch_size: 64
-  use_per_replica_batch_size: false
+  batch_size: 128
+  use_per_replica_batch_size: true
   mean_subtract: false
   standardize: false
   dtype: 'bfloat16'
@@ -28,8 +28,8 @@ validation_dataset:
   image_size: 32
   num_classes: 10
   num_examples: 10000
-  batch_size: 64
-  use_per_replica_batch_size: false
+  batch_size: 128
+  use_per_replica_batch_size: true
   mean_subtract: false
   standardize: false
   dtype: 'bfloat16'

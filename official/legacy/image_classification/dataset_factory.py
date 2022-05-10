@@ -445,23 +445,24 @@ class DatasetBuilder:
     dataset = dataset.map(
         preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-    if self.input_context and self.config.num_devices > 1:
-      if not self.config.use_per_replica_batch_size:
-        raise ValueError(
-            'The builder does not support a global batch size with more than '
-            'one replica. Got {} replicas. Please set a '
-            '`per_replica_batch_size` and enable '
-            '`use_per_replica_batch_size=True`.'.format(
-                self.config.num_devices))
+    # if self.input_context and self.config.num_devices > 1:
+    #   if not self.config.use_per_replica_batch_size:
+    #     raise ValueError(
+    #         'The builder does not support a global batch size with more than '
+    #         'one replica. Got {} replicas. Please set a '
+    #         '`per_replica_batch_size` and enable '
+    #         '`use_per_replica_batch_size=True`.'.format(
+    #             self.config.num_devices))
 
-      # The batch size of the dataset will be multiplied by the number of
-      # replicas automatically when strategy.distribute_datasets_from_function
-      # is called, so we use local batch size here.
-      dataset = dataset.batch(
-          self.local_batch_size, drop_remainder=self.is_training)
-    else:
-      dataset = dataset.batch(
-          self.global_batch_size, drop_remainder=self.is_training)
+    #   # The batch size of the dataset will be multiplied by the number of
+    #   # replicas automatically when strategy.distribute_datasets_from_function
+    #   # is called, so we use local batch size here.
+    #   dataset = dataset.batch(
+    #       self.local_batch_size, drop_remainder=self.is_training)
+    # else:
+    #   dataset = dataset.batch(
+    #       self.global_batch_size, drop_remainder=self.is_training)
+    dataset = dataset.batch(self.config.batch_size, drop_remainder=True)
 
     # Prefetch overlaps in-feed with training
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
