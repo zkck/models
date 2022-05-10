@@ -355,7 +355,7 @@ def build_eval_dataset(filenames: List[Text],
 
   dataset = dataset.map(
       lambda filename, label: (load_eval_image(filename, image_size), label))
-  dataset = dataset.batch(batch_size)
+  dataset = dataset.batch(batch_size, drop_remainder=True)
 
   return dataset
 
