@@ -480,8 +480,16 @@ class DatasetBuilder:
 
     return dataset
 
-  def parse_record(self, record: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
-    """Parse an ImageNet record from a serialized string Tensor."""
+  def _get_bytes(self, record: tf.Tensor):
+    try:
+      return {
+        'cifar10': self._get_bytes_cifar10,
+        'imagenet': self._get_bytes_imagenet
+      }[self.config.name](record)
+    except KeyError:
+      raise ValueError("Unknown dataset config name, could not load records.")
+
+  def _get_bytes_imagenet(self, record: tf.Tensor):
     keys_to_features = {
         'image/encoded': tf.io.FixedLenFeature((), tf.string, ''),
         'image/format': tf.io.FixedLenFeature((), tf.string, 'jpeg'),
@@ -502,9 +510,21 @@ class DatasetBuilder:
     label -= 1
 
     image_bytes = tf.reshape(parsed['image/encoded'], shape=[])
-    image, label = self.preprocess(image_bytes, label)
+    return image_bytes, label
 
-    return image, label
+  def _get_bytes_cifar10(self, record: tf.Tensor):
+    keys_to_features = {
+      'id': tf.io.FixedLenFeature([], tf.string),
+      'label': tf.io.FixedLenFeature([], tf.int64),
+      'image': tf.io.FixedLenFeature([], tf.string),
+    }
+    parsed = tf.io.parse_single_example(record, keys_to_features)
+    return parsed["image"], parsed["label"]
+
+  def parse_record(self, record: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
+    """Parse an ImageNet record from a serialized string Tensor."""
+    image_bytes, label = self._get_bytes(record)
+    return self.preprocess(image_bytes, label)
 
   def preprocess(self, image: tf.Tensor,
                  label: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
