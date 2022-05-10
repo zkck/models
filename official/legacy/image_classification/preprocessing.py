@@ -29,7 +29,7 @@ MEAN_RGB = (0.485 * 255, 0.456 * 255, 0.406 * 255)
 STDDEV_RGB = (0.229 * 255, 0.224 * 255, 0.225 * 255)
 
 IMAGE_SIZE = 224
-CROP_PADDING = 32
+CROP_PADDING = 4
 
 
 def mean_image_subtraction(
