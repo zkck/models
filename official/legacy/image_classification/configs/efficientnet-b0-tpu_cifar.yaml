@@ -1,6 +1,6 @@
-# Training configuration for ResNet trained on ImageNet on TPUs.
-# Takes ~4 minutes, 30 seconds seconds per epoch for a v3-32.
-# Reaches > 76.1% within 90 epochs.
+# Training configuration for EfficientNet-b0 trained on ImageNet on TPUs.
+# Takes ~2 minutes, 50 seconds per epoch for v3-32.
+# Reaches ~76.1% within 350 epochs.
 # Note: This configuration uses a scaled per-replica batch size based on the number of devices.
 runtime:
   distribution_strategy: 'tpu'
@@ -35,27 +35,26 @@ validation_dataset:
   dtype: 'bfloat16'
   filenames: ['cifar10-test.tfrecord-00000-of-00001']
 model:
-  name: 'resnet'
-  num_classes: 10
   model_params:
-    rescale_inputs: true
-    num_classes: 10
-    image_size: 32
+    model_name: 'efficientnet-b0'
+    overrides:
+      num_classes: 10
+      batch_norm: 'tpu'
+      dtype: 'bfloat16'
+      activation: 'swish'
   optimizer:
-    name: 'momentum'
+    name: 'rmsprop'
     momentum: 0.9
     decay: 0.9
-    epsilon: 0.001
-    moving_average_decay: 0.
+    moving_average_decay: 0.0
     lookahead: false
+  learning_rate:
+    name: 'exponential'
   loss:
     label_smoothing: 0.1
-  learning_rate:
-    examples_per_epoch: 50000
 train:
-  callbacks:
-    enable_checkpoint_and_export: true
   resume_checkpoint: true
   epochs: 10
+  set_epoch_loop: true
 evaluation:
   epochs_between_evals: 1
