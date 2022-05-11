@@ -82,6 +82,9 @@ def build_stats(time_history):
   }
 
 def run(flags_obj):
+  distribute_utils.configure_cluster(flags_obj.worker_hosts,
+                                     flags_obj.task_index)
+
   # Note: for TPUs, strategy and scope should be created before the dataset
   strategy = distribute_utils.get_distribution_strategy(
       distribution_strategy='tpu',
