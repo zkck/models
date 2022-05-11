@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import logging
 import os
 import pathlib
 from official.legacy.image_classification.classifier_trainer import define_classifier_flags
@@ -24,6 +23,8 @@ from tensorflow.keras import layers
 from tensorflow.keras import models
 from absl import flags
 from absl import app
+from absl import logging
+
 
 
 NUM_LABELS = 8
