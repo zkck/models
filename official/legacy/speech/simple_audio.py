@@ -107,8 +107,10 @@ def main(_):
     tf.config.experimental.enable_op_determinism()
   stats = run(flags.FLAGS)
   if stats:
+    model_dir = pathlib.Path(flags.FLAGS.model_dir)
+    model_dir.mkdir(parents=True, exist_ok=True)
     logging.info('Run stats:\n%s', stats)
-    with open(os.path.join(flags.FLAGS.model_dir, 'stats.json'), 'w') as f:
+    with (model_dir / 'stats.json').open('w') as f:
       json.dump(stats, f, default=str, indent=2)
 
 
@@ -116,5 +118,6 @@ if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   define_classifier_flags()
   flags.mark_flag_as_required('data_dir')
+  flags.mark_flag_as_required('model_dir')
   app.run(main)
 
