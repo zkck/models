@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import os
 import pathlib
+
+from absl import app
+from absl import flags
+from absl import logging
+import tensorflow as tf
+from official.common import distribute_utils
+
 from official.legacy.image_classification.classifier_trainer import define_classifier_flags
 
 from official.legacy.speech import preprocessing
@@ -76,9 +82,20 @@ def build_stats(time_history):
   }
 
 def run(flags_obj):
+  # Note: for TPUs, strategy and scope should be created before the dataset
+  strategy = distribute_utils.get_distribution_strategy(
+      distribution_strategy='tpu',
+      tpu_address='local')
+
+  strategy_scope = distribute_utils.get_strategy_scope(strategy)
+
+  logging.info('Detected %d devices.',
+               strategy.num_replicas_in_sync if strategy else 1)
+
   train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
 
-  model = make_model(train_ds)
+  with strategy_scope:
+    model = make_model(train_ds)
 
   batch_size = 64
   train_ds = train_ds.batch(batch_size)
