@@ -98,6 +98,8 @@ def run(flags_obj):
       tf.keras.callbacks.EarlyStopping(verbose=1, patience=2)],
   )
 
+  return build_stats(time_history)
+
 
 def main(_):
   if flags.FLAGS.enable_op_determinism:
