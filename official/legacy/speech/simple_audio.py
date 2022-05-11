@@ -87,7 +87,7 @@ def run(flags_obj):
   train_ds = train_ds.cache().prefetch(tf.data.AUTOTUNE)
   val_ds = val_ds.cache().prefetch(tf.data.AUTOTUNE)
 
-  time_history = TimeHistory(batch_size=batch_size, log_steps=flags_obj.log_steps),
+  time_history = TimeHistory(batch_size=batch_size, log_steps=flags_obj.log_steps)
 
   history = model.fit(
     train_ds,
