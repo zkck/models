@@ -95,9 +95,9 @@ def run(flags_obj):
   logging.info('Detected %d devices.',
                strategy.num_replicas_in_sync if strategy else 1)
 
-  train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
 
   with strategy_scope:
+    train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
     model = make_model(train_ds)
 
   batch_size = 64
