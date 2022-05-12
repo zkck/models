@@ -38,21 +38,37 @@ NUM_LABELS = 8
 EPOCHS = 10
 
 
-def make_model(dataset):
-  for spectrogram, _ in dataset.take(1):
-    input_shape = spectrogram.shape
-  # Instantiate the `tf.keras.layers.Normalization` layer.
-  norm_layer = layers.Normalization()
-  # Fit the state of the layer to the spectrograms
-  # with `Normalization.adapt`.
-  norm_layer.adapt(data=dataset.map(map_func=lambda spec, label: spec))
+def make_tpu_strategy():
+  resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+  tf.config.experimental_connect_to_cluster(resolver)
+  # This is the TPU initialization code that has to be at the beginning.
+  tf.tpu.experimental.initialize_tpu_system(resolver)
+  print("All devices: ", tf.config.list_logical_devices('TPU'))
 
-  model = models.Sequential([
-      layers.Input(shape=input_shape),
+  a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+
+  with tf.device('/TPU:0'):
+    c = tf.matmul(a, b)
+
+  print("c device: ", c.device)
+  print(c)
+
+  return tf.distribute.TPUStrategy(resolver)
+
+
+def create_model(dataset):
+  # # Instantiate the `tf.keras.layers.Normalization` layer.
+  # norm_layer = layers.Normalization()
+  # # Fit the state of the layer to the spectrograms
+  # # with `Normalization.adapt`.
+  # norm_layer.adapt(data=dataset.map(map_func=lambda spec, label: spec))
+  return models.Sequential([
+      layers.Input(shape=(124, 129, 1)),
       # Downsample the input.
       layers.Resizing(32, 32),
       # Normalize.
-      norm_layer,
+      # norm_layer,
       layers.Conv2D(32, 3, activation='relu'),
       layers.Conv2D(64, 3, activation='relu'),
       layers.MaxPooling2D(),
@@ -63,42 +79,28 @@ def make_model(dataset):
       layers.Dense(NUM_LABELS),
   ])
 
-  model.summary()
-
-
-  model.compile(
-      optimizer=tf.keras.optimizers.Adam(),
-      loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-      metrics=['accuracy'],
-  )
-
-  return model
-
-
 def build_stats(time_history):
   return {
     'epoch_runtime_log': time_history.epoch_runtime_log,
     'batch_runtime_log': time_history.batch_runtime_log,
   }
 
+
+
 def run(flags_obj):
-  distribute_utils.configure_cluster(flags_obj.worker_hosts,
-                                     flags_obj.task_index)
+  strategy = make_tpu_strategy()
 
-  # Note: for TPUs, strategy and scope should be created before the dataset
-  strategy = distribute_utils.get_distribution_strategy(
-      distribution_strategy='tpu',
-      tpu_address='local')
+  train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
 
-  strategy_scope = distribute_utils.get_strategy_scope(strategy)
+  with strategy.scope():
+    model = create_model(train_ds)
+    model.summary()
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy'],
+    )
 
-  logging.info('Detected %d devices.',
-               strategy.num_replicas_in_sync if strategy else 1)
-
-
-  with strategy_scope:
-    train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
-    model = make_model(train_ds)
 
   batch_size = 64
   train_ds = train_ds.batch(batch_size)
@@ -109,7 +111,7 @@ def run(flags_obj):
 
   time_history = TimeHistory(batch_size=batch_size, log_steps=flags_obj.log_steps)
 
-  history = model.fit(
+  model.fit(
     train_ds,
     validation_data=val_ds,
     epochs=EPOCHS,

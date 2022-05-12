@@ -82,7 +82,7 @@ def make_datasets(data_dir: Path) -> tf.data.Dataset:
     #     origin="http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip",
     #     extract=True,
     #     cache_dir='.', cache_subdir='data')
-    commands = np.array(tf.io.gfile.listdir(str(data_dir)))
+    commands = np.array(["down", "go", "left", "no", "right", "stop", "up", "yes"])
     commands = commands[commands != 'README.md']
     print('Commands:', commands)
 
