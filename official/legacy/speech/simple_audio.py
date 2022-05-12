@@ -39,7 +39,7 @@ EPOCHS = 10
 
 
 def make_tpu_strategy():
-  resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+  resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
   tf.config.experimental_connect_to_cluster(resolver)
   # This is the TPU initialization code that has to be at the beginning.
   tf.tpu.experimental.initialize_tpu_system(resolver)
@@ -100,7 +100,6 @@ def run(flags_obj):
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=['accuracy'],
     )
-
 
   batch_size = 64
   train_ds = train_ds.batch(batch_size)
