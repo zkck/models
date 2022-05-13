@@ -24,6 +24,7 @@ from official.legacy.image_classification.classifier_trainer import define_class
 
 from official.legacy.speech import preprocessing
 import tensorflow as tf
+import tensorflow_datasets as tfds
 from official.utils.misc.keras_utils import TimeHistory
 from tensorflow.keras import layers
 from tensorflow.keras import models
@@ -38,7 +39,7 @@ NUM_LABELS = 8
 EPOCHS = 10
 
 
-def make_tpu_strategy():
+def create_tpu_strategy():
   resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
   tf.config.experimental_connect_to_cluster(resolver)
   # This is the TPU initialization code that has to be at the beginning.
@@ -88,9 +89,10 @@ def build_stats(time_history):
 
 
 def run(flags_obj):
-  strategy = make_tpu_strategy()
+  strategy = create_tpu_strategy()
 
-  train_ds, val_ds, test_ds = preprocessing.make_datasets(pathlib.Path(flags_obj.data_dir))
+  train_ds = tfds.load('speech_commands', split='train')
+  val_ds = tfds.load('speech_commands', split='validation')
 
   with strategy.scope():
     model = create_model(train_ds)
