@@ -443,7 +443,7 @@ class DatasetBuilder:
     else:
       preprocess = self.preprocess
 
-    num_parallel_calls = flags.FLAGS.num_parallel_calls
+    num_parallel_calls = flags.FLAGS.num_parallel_calls_map
     if num_parallel_calls is None:
       num_parallel_calls = tf.data.experimental.AUTOTUNE
 
