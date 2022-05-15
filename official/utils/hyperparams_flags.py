@@ -86,7 +86,10 @@ def define_common_hparams_flags():
       default=False,
       help='Force deterministic ordering on the dataset.')
 
-
+  flags.DEFINE_integer(
+      'map_num_parallel_calls',
+      default=None,
+      help='Set number of parallel calls for map')
 
 
 def initialize_common_flags():

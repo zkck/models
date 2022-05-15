@@ -442,8 +442,13 @@ class DatasetBuilder:
       preprocess = self.parse_record
     else:
       preprocess = self.preprocess
+
+    num_parallel_calls = flags.FLAGS.num_parallel_calls
+    if num_parallel_calls is None:
+      num_parallel_calls = tf.data.experimental.AUTOTUNE
+
     dataset = dataset.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=num_parallel_calls)
 
     if self.input_context and self.config.num_devices > 1:
       if not self.config.use_per_replica_batch_size:
