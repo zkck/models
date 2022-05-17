@@ -36,6 +36,11 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
+resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
+tf.config.experimental_connect_to_cluster(resolver)
+# This is the TPU initialization code that has to be at the beginning.
+tf.tpu.experimental.initialize_tpu_system(resolver)
+print("All devices: ", tf.config.list_logical_devices('TPU'))
 
 """
 ## Define the Transformer Input Layer
@@ -495,30 +500,33 @@ display_cb = DisplayOutputs(
     batch, idx_to_char, target_start_token_idx=2, target_end_token_idx=3
 )  # set the arguments as per vocabulary index for '<' and '>'
 
-model = Transformer(
-    num_hid=200,
-    num_head=2,
-    num_feed_forward=400,
-    target_maxlen=max_target_len,
-    num_layers_enc=4,
-    num_layers_dec=1,
-    num_classes=34,
-)
-loss_fn = tf.keras.losses.CategoricalCrossentropy(
-    from_logits=True,
-    label_smoothing=0.1,
-)
+strategy = tf.distribute.TPUStrategy(resolver)
 
-learning_rate = CustomSchedule(
-    init_lr=0.00001,
-    lr_after_warmup=0.001,
-    final_lr=0.00001,
-    warmup_epochs=15,
-    decay_epochs=85,
-    steps_per_epoch=len(ds),
-)
-optimizer = keras.optimizers.Adam(learning_rate)
-model.compile(optimizer=optimizer, loss=loss_fn)
+with strategy.scope():
+    model = Transformer(
+        num_hid=200,
+        num_head=2,
+        num_feed_forward=400,
+        target_maxlen=max_target_len,
+        num_layers_enc=4,
+        num_layers_dec=1,
+        num_classes=34,
+    )
+    loss_fn = tf.keras.losses.CategoricalCrossentropy(
+        from_logits=True,
+        label_smoothing=0.1,
+    )
+
+    learning_rate = CustomSchedule(
+        init_lr=0.00001,
+        lr_after_warmup=0.001,
+        final_lr=0.00001,
+        warmup_epochs=15,
+        decay_epochs=85,
+        steps_per_epoch=len(ds),
+    )
+    optimizer = keras.optimizers.Adam(learning_rate)
+    model.compile(optimizer=optimizer, loss=loss_fn)
 
 history = model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=1)
 
