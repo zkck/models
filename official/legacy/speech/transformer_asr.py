@@ -501,7 +501,7 @@ idx_to_char = vectorizer.get_vocabulary()
 display_cb = DisplayOutputs(
     batch, idx_to_char, target_start_token_idx=2, target_end_token_idx=3
 )  # set the arguments as per vocabulary index for '<' and '>'
-timehist_cb = TimeHistory(64, 128, logdir=(Path.home() / 'data-speech'))
+timehist_cb = TimeHistory(64, 128, logdir=str(Path.home() / 'data-speech'))
 
 strategy = tf.distribute.TPUStrategy(resolver)
 
