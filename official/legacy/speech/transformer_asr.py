@@ -528,7 +528,7 @@ with strategy.scope():
     # optimizer = keras.optimizers.Adam(learning_rate)
     model.compile(optimizer='adam', loss=loss_fn)
 
-history = model.fit(ds, validation_data=val_ds, callbacks=[], epochs=50)
+history = model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=50)
 
 """
 In practice, you should train for around 100 epochs or more.
