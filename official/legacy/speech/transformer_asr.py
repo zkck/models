@@ -517,16 +517,16 @@ with strategy.scope():
         label_smoothing=0.1,
     )
 
-    learning_rate = CustomSchedule(
-        init_lr=0.00001,
-        lr_after_warmup=0.001,
-        final_lr=0.00001,
-        warmup_epochs=15,
-        decay_epochs=85,
-        steps_per_epoch=len(ds),
-    )
-    optimizer = keras.optimizers.Adam(learning_rate)
-    model.compile(optimizer=optimizer, loss=loss_fn)
+    # learning_rate = CustomSchedule(
+    #     init_lr=0.00001,
+    #     lr_after_warmup=0.001,
+    #     final_lr=0.00001,
+    #     warmup_epochs=15,
+    #     decay_epochs=85,
+    #     steps_per_epoch=len(ds),
+    # )
+    # optimizer = keras.optimizers.Adam(learning_rate)
+    model.compile(optimizer='adam', loss=loss_fn)
 
 history = model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=10)
 
