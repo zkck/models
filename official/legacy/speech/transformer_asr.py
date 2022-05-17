@@ -30,10 +30,12 @@ as proposed in the paper, "Attention is All You Need".
 
 
 import os
+from pathlib import Path
 import random
 from glob import glob
 import tensorflow as tf
 from tensorflow import keras
+from official.utils.misc.keras_utils import TimeHistory
 from tensorflow.keras import layers
 
 resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
@@ -499,6 +501,7 @@ idx_to_char = vectorizer.get_vocabulary()
 display_cb = DisplayOutputs(
     batch, idx_to_char, target_start_token_idx=2, target_end_token_idx=3
 )  # set the arguments as per vocabulary index for '<' and '>'
+timehist_cb = TimeHistory(64, 128, logdir=(Path.home() / 'data-speech'))
 
 strategy = tf.distribute.TPUStrategy(resolver)
 
@@ -528,7 +531,7 @@ with strategy.scope():
     optimizer = keras.optimizers.Adam(learning_rate)
     model.compile(optimizer=optimizer, loss=loss_fn)
 
-history = model.fit(ds, validation_data=val_ds, callbacks=[display_cb], epochs=50)
+history = model.fit(ds, validation_data=val_ds, callbacks=[display_cb, timehist_cb], epochs=10)
 
 """
 In practice, you should train for around 100 epochs or more.
