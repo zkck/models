@@ -393,7 +393,7 @@ def create_tf_dataset(data, bs=4):
     text_ds = create_text_ds(data)
     ds = tf.data.Dataset.zip((audio_ds, text_ds))
     ds = ds.map(lambda x, y: {"source": x, "target": y})
-    ds = ds.batch(bs)
+    ds = ds.batch(bs, drop_remainder=True)
     ds = ds.prefetch(tf.data.AUTOTUNE)
     return ds
 
