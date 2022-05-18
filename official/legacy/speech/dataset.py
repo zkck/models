@@ -69,12 +69,12 @@ class DatasetFactory:
             for line in f:
                 id = line.strip().split("|")[0]
                 text = line.strip().split("|")[2]
-                self.id_to_text[id] = text
+                self._id_to_text[id] = text
 
         for w in wavs:
             id = w.split("/")[-1].split(".")[0]
-            if len(self.id_to_text[id]) < self._vectorizer.max_len:
-                self._data.append({"audio": w, "text": self.id_to_text[id]})
+            if len(self._id_to_text[id]) < self._vectorizer.max_len:
+                self._data.append({"audio": w, "text": self._id_to_text[id]})
 
     def create_text_ds(self, data):
         texts = [_["text"] for _ in data]
