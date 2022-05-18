@@ -63,7 +63,7 @@ class DatasetFactory:
         )
 
         saveto = "./datasets/LJSpeech-1.1"
-        wavs = glob("{}/**/*.wav".format(saveto), recursive=True)
+        wavs = glob.glob("{}/**/*.wav".format(saveto), recursive=True)
 
         with open(os.path.join(saveto, "metadata.csv"), encoding="utf-8") as f:
             for line in f:
