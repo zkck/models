@@ -28,11 +28,12 @@ as proposed in the paper, "Attention is All You Need".
 - [LJSpeech Dataset](https://keithito.com/LJ-Speech-Dataset/)
 """
 import json
-import logging
 from pathlib import Path
 
 import tensorflow as tf
-from absl import app, flags
+from absl import app
+from absl import flags
+from absl import logging
 from official.legacy.image_classification.classifier_trainer import (
     define_classifier_flags,
 )
