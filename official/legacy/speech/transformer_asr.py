@@ -111,8 +111,5 @@ if __name__ == "__main__":
     logging.set_verbosity(logging.INFO)
     define_classifier_flags()
     flags.mark_flag_as_required("data_dir")
-    flags.mark_flag_as_required("mode")
-    flags.mark_flag_as_required("model_type")
-    flags.mark_flag_as_required("dataset")
-
+    flags.mark_flag_as_required("model_dir")
     app.run(main)
