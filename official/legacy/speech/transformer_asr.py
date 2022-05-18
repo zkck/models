@@ -55,7 +55,7 @@ def run(flags_obj):
     max_target_len = 200  # all transcripts in out data are < 200 characters
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
-    ds, val_ds = dataset.DatasetFactory(vectorizer).create_tf_datasets()
+    ds, val_ds = dataset.DatasetFactory(vectorizer).get_datasets()
 
     with create_strategy().scope():
         model = layers.create_model(len(ds), max_target_len)
