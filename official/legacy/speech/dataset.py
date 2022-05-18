@@ -99,9 +99,9 @@ class DatasetFactory:
 
     def get_datasets(self):
         print("vocab size", len(self._vectorizer.get_vocabulary()))
-        split = int(len(self.data) * 0.99)
-        train_data = self.data[:split]
-        test_data = self.data[split:]
+        split = int(len(self._data) * 0.99)
+        train_data = self._data[:split]
+        test_data = self._data[split:]
         ds = self.create_tf_dataset(train_data, bs=64)
         val_ds = self.create_tf_dataset(test_data, bs=4)
         return ds, val_ds
