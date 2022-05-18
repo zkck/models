@@ -99,6 +99,7 @@ class DatasetFactory:
 
     def get_datasets(self):
         print("vocab size", len(self._vectorizer.get_vocabulary()))
+        print("data size", len(self._data))
         split = int(len(self._data) * 0.99)
         train_data = self._data[:split]
         test_data = self._data[split:]

@@ -73,7 +73,7 @@ def run(flags_obj):
             ),
             time_history,
         ],
-        epochs=10,
+        epochs=50,
     )
 
     return {
