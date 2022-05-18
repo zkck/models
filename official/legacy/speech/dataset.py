@@ -97,12 +97,13 @@ class DatasetFactory:
         ds = ds.prefetch(tf.data.AUTOTUNE)
         return ds
 
-    def get_datasets(self):
+    def get_dataset(self, is_training):
         print("vocab size", len(self._vectorizer.get_vocabulary()))
         print("data size", len(self._data))
         split = int(len(self._data) * 0.99)
-        train_data = self._data[:split]
-        test_data = self._data[split:]
-        ds = self.create_tf_dataset(train_data, bs=64)
-        val_ds = self.create_tf_dataset(test_data, bs=4)
-        return ds, val_ds
+        if is_training:
+            data, bs = self._data[:split], 64
+        else:
+            data, bs = self._data[split:], 4
+            bs = 4
+        return self.create_tf_dataset(data, bs=bs)

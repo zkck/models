@@ -52,12 +52,14 @@ def create_strategy():
 
 
 def run(flags_obj):
+    strategy = create_strategy()
     max_target_len = 200  # all transcripts in out data are < 200 characters
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
-    ds, val_ds = dataset.DatasetFactory(vectorizer).get_datasets()
+    ds_factory = dataset.DatasetFactory(vectorizer)
+    ds, val_ds = [strategy.distribute_dataset_from_function(lambda: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
 
-    with create_strategy().scope():
+    with strategy.scope():
         model = layers.create_model(len(ds), max_target_len)
 
     time_history = TimeHistory(64, flags_obj.log_steps, logdir=flags_obj.model_dir)
