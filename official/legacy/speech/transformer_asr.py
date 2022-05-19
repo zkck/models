@@ -57,7 +57,7 @@ def run(flags_obj):
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
     ds_factory = dataset.DatasetFactory(vectorizer)
-    ds, val_ds = [strategy.distribute_dataset_from_function(lambda: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
+    ds, val_ds = [strategy.distribute_datasets_from_function(lambda: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
 
     with strategy.scope():
         model = layers.create_model(len(ds), max_target_len)
@@ -67,12 +67,12 @@ def run(flags_obj):
         ds,
         validation_data=val_ds,
         callbacks=[
-            callbacks.DisplayOutputs(
-                next(iter(val_ds)),
-                vectorizer.get_vocabulary(),
-                target_start_token_idx=2,
-                target_end_token_idx=3,
-            ),
+            # callbacks.DisplayOutputs(
+            #     next(iter(val_ds)),
+            #     vectorizer.get_vocabulary(),
+            #     target_start_token_idx=2,
+            #     target_end_token_idx=3,
+            # ),
             time_history,
         ],
         epochs=100,
