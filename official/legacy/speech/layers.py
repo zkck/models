@@ -277,7 +277,7 @@ class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
         return self.calculate_lr(epoch)
 
 
-def create_model(steps_per_epoch, max_target_len):
+def create_model(max_target_len):
     model = Transformer(
         num_hid=200,
         num_head=2,
@@ -297,7 +297,7 @@ def create_model(steps_per_epoch, max_target_len):
         final_lr=0.00001,
         warmup_epochs=15,
         decay_epochs=85,
-        steps_per_epoch=steps_per_epoch,
+        steps_per_epoch=13000,
     )
     optimizer = keras.optimizers.Adam(learning_rate)
     model.compile(optimizer=optimizer, loss=loss_fn)
