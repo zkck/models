@@ -76,6 +76,7 @@ def run(flags_obj):
             time_history,
         ],
         epochs=100,
+        steps_per_epoch=13_000,
     )
 
     return {
