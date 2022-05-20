@@ -60,7 +60,7 @@ def run(flags_obj):
     ds, val_ds = [strategy.distribute_datasets_from_function(lambda _: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
 
     with strategy.scope():
-        model = layers.create_model(max_target_len)
+        model = layers.create_model(len(ds), max_target_len)
 
     time_history = TimeHistory(64, flags_obj.log_steps, logdir=flags_obj.model_dir)
     model.fit(
@@ -76,7 +76,7 @@ def run(flags_obj):
             time_history,
         ],
         epochs=100,
-        steps_per_epoch=13_000,
+        steps_per_epoch=202,  # from observation
     )
 
     return {

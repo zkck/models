@@ -100,9 +100,10 @@ class DatasetFactory:
     def get_dataset(self, is_training):
         print("vocab size", len(self._vectorizer.get_vocabulary()))
         print("data size", len(self._data))
+        split = int(len(self._data) * 0.99)
         if is_training:
-            data, bs = self._data[:13_000], 64
+            data, bs = self._data[:split], 64
         else:
-            data, bs = self._data[13_000:], 4
+            data, bs = self._data[split:], 4
             bs = 4
         return self.create_tf_dataset(data, bs=bs)
