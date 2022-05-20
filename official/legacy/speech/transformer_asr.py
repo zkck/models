@@ -57,7 +57,7 @@ def run(flags_obj):
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
     ds_factory = dataset.DatasetFactory(vectorizer)
-    ds, val_ds = [strategy.distribute_datasets_from_function(lambda: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
+    ds, val_ds = [strategy.distribute_datasets_from_function(lambda _: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
 
     with strategy.scope():
         model = layers.create_model(len(ds), max_target_len)
