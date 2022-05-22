@@ -57,7 +57,8 @@ def run(flags_obj):
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
     ds_factory = dataset.DatasetFactory(vectorizer)
-    ds, val_ds = [strategy.distribute_datasets_from_function(lambda _: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
+    # ds, val_ds = [strategy.distribute_datasets_from_function(lambda _: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
+    ds, val_ds = (ds_factory.get_dataset(is_training) for is_training in [True, False])
 
     with strategy.scope():
         model = layers.create_model(max_target_len)
@@ -76,7 +77,7 @@ def run(flags_obj):
             time_history,
         ],
         epochs=100,
-        steps_per_epoch=202,  # from observation
+        # steps_per_epoch=202,  # from observation
     )
 
     return {

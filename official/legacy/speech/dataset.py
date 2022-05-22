@@ -105,5 +105,4 @@ class DatasetFactory:
             data, bs = self._data[:split], 64
         else:
             data, bs = self._data[split:], 4
-            bs = 4
         return self.create_tf_dataset(data, bs=bs)
