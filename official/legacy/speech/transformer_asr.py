@@ -76,7 +76,7 @@ def run(flags_obj):
             # ),
             time_history,
         ],
-        epochs=100,
+        epochs=10,
         # steps_per_epoch=202,  # from observation
     )
 
