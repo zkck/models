@@ -121,7 +121,7 @@ if __name__ == "__main__":
     logging.set_verbosity(logging.INFO)
     define_classifier_flags()
     flags.DEFINE_integer("max_target_len", required=True, help="Length of speech waveforms", default=None)
-    flags.DEFINE_integer("dataset_name", required=True, help="Name of dataset.", default=None)
+    flags.DEFINE_string("dataset_name", required=True, help="Name of dataset.", default=None)
     # flags.mark_flag_as_required("data_dir")
     flags.mark_flag_as_required("model_dir")
     app.run(main)
