@@ -57,7 +57,8 @@ class DatasetFactory(abc.ABC):
         self._data = []
         self._id_to_text = {}
         data_dir = Path(data_dir)
-        assert data_dir.is_dir()
+        if not data_dir.is_dir():
+            raise ValueError(f"Not a directory: {data_dir}")
         self._populate(Path(data_dir))
 
     @abc.abstractmethod
