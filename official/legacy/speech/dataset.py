@@ -7,6 +7,8 @@ from typing import Iterator
 import tensorflow as tf
 from tensorflow import keras
 
+from official.legacy.speech import specaugment
+
 
 def path_to_audio(path):
     # spectrogram using stft
@@ -81,7 +83,7 @@ class DatasetFactory(abc.ABC):
         audio_ds = self.create_audio_ds(data)
         text_ds = self.create_text_ds(data)
         ds = tf.data.Dataset.zip((audio_ds, text_ds))
-        ds = ds.map(lambda x, y: {"source": x, "target": y}, num_parallel_calls=tf.data.AUTOTUNE)
+        ds = ds.map(lambda x, y: {"source": specaugment.spec_augment(x), "target": y}, num_parallel_calls=tf.data.AUTOTUNE)
         ds = ds.batch(bs, drop_remainder=True)
         ds = ds.prefetch(tf.data.AUTOTUNE)
         return ds
