@@ -1,5 +1,9 @@
+import abc
+from dataclasses import dataclass
 import glob
 import os
+from pathlib import Path
+from typing import Iterator
 import tensorflow as tf
 from tensorflow import keras
 
@@ -46,35 +50,19 @@ class VectorizeChar:
         return self.vocab
 
 
-class DatasetFactory:
-    def __init__(self, vectorizer: VectorizeChar) -> None:
+class DatasetFactory(abc.ABC):
+
+    def __init__(self, vectorizer: VectorizeChar, data_dir: str) -> None:
         self._vectorizer = vectorizer
         self._data = []
         self._id_to_text = {}
-        self.__populate()
+        data_dir = Path(data_dir)
+        assert data_dir.is_dir()
+        self._populate(Path(data_dir))
 
-    def __populate(self):
-        keras.utils.get_file(
-            os.path.join(os.getcwd(), "data.tar.gz"),
-            "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
-            extract=True,
-            archive_format="tar",
-            cache_dir=".",
-        )
-
-        saveto = "./datasets/LJSpeech-1.1"
-        wavs = glob.glob("{}/**/*.wav".format(saveto), recursive=True)
-
-        with open(os.path.join(saveto, "metadata.csv"), encoding="utf-8") as f:
-            for line in f:
-                id = line.strip().split("|")[0]
-                text = line.strip().split("|")[2]
-                self._id_to_text[id] = text
-
-        for w in wavs:
-            id = w.split("/")[-1].split(".")[0]
-            if len(self._id_to_text[id]) < self._vectorizer.max_len:
-                self._data.append({"audio": w, "text": self._id_to_text[id]})
+    @abc.abstractmethod
+    def _populate(self, data_dir: Path) -> None:
+        """Implemented in subclasses."""
 
     def create_text_ds(self, data):
         texts = [_["text"] for _ in data]
@@ -106,3 +94,40 @@ class DatasetFactory:
         else:
             data, bs = self._data[split:], 4
         return self.create_tf_dataset(data, bs=bs)
+
+
+class LJSpeech(DatasetFactory):
+
+    def _populate(self, data_dir: Path):
+        keras.utils.get_file(
+            os.path.join(os.getcwd(), "data.tar.gz"),
+            "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
+            extract=True,
+            archive_format="tar",
+            cache_dir=".",
+        )
+
+        saveto = "./datasets/LJSpeech-1.1"
+        wavs = glob.glob("{}/**/*.wav".format(saveto), recursive=True)
+
+        with open(os.path.join(saveto, "metadata.csv"), encoding="utf-8") as f:
+            for line in f:
+                id = line.strip().split("|")[0]
+                text = line.strip().split("|")[2]
+                self._id_to_text[id] = text
+
+        for w in wavs:
+            id = w.split("/")[-1].split(".")[0]
+            if len(self._id_to_text[id]) < self._vectorizer.max_len:
+                self._data.append({"audio": w, "text": self._id_to_text[id]})
+
+class LibriSpeech(DatasetFactory):
+
+    def _populate(self, data_dir: Path):
+        for trans_file in data_dir.glob("*/*/*.trans.txt"):
+            with trans_file.open() as f:
+                for line in f:
+                    id, text = line.split(maxsplit=1)
+                    self._id_to_text[id] = text
+                    wav_file = trans_file.parent / f"{id}.wav"
+                    self._data.append({"audio": wav_file, "text": text})

@@ -50,13 +50,18 @@ def create_strategy():
 
     return tf.distribute.TPUStrategy(resolver)
 
+def get_factory(dataset_name: str):
+    return {
+        "ljspeech": dataset.LJSpeech,
+        "librispeech": dataset.LibriSpeech,
+    }[dataset_name]
 
 def run(flags_obj):
     strategy = create_strategy()
     max_target_len = flags_obj.max_target_len
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
-    ds_factory = dataset.DatasetFactory(vectorizer)
+    ds_factory = get_factory(flags_obj.dataset_name)(vectorizer, flags_obj.data_dir)
     # ds, val_ds = [strategy.distribute_datasets_from_function(lambda _: ds_factory.get_dataset(is_training)) for is_training in [True, False]]
     ds, val_ds = (ds_factory.get_dataset(is_training) for is_training in [True, False])
 
@@ -116,6 +121,7 @@ if __name__ == "__main__":
     logging.set_verbosity(logging.INFO)
     define_classifier_flags()
     flags.DEFINE_integer("max_target_len", required=True, help="Length of speech waveforms", default=None)
+    flags.DEFINE_integer("dataset_name", required=True, help="Name of dataset.", default=None)
     # flags.mark_flag_as_required("data_dir")
     flags.mark_flag_as_required("model_dir")
     app.run(main)
