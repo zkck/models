@@ -100,18 +100,17 @@ class DatasetFactory(abc.ABC):
 class LJSpeech(DatasetFactory):
 
     def _populate(self, data_dir: Path):
-        keras.utils.get_file(
-            os.path.join(os.getcwd(), "data.tar.gz"),
-            "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
-            extract=True,
-            archive_format="tar",
-            cache_dir=".",
-        )
+        # keras.utils.get_file(
+        #     os.path.join(os.getcwd(), "data.tar.gz"),
+        #     "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
+        #     extract=True,
+        #     archive_format="tar",
+        #     cache_dir=".",
+        # )
 
-        saveto = "./datasets/LJSpeech-1.1"
-        wavs = glob.glob("{}/**/*.wav".format(saveto), recursive=True)
+        wavs = data_dir.glob("**/*.wav", recursive=True)
 
-        with open(os.path.join(saveto, "metadata.csv"), encoding="utf-8") as f:
+        with (data_dir / "metadata.csv").open(encoding="utf-8") as f:
             for line in f:
                 id = line.strip().split("|")[0]
                 text = line.strip().split("|")[2]
