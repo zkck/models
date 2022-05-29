@@ -108,6 +108,8 @@ prediction: <under the introus for may monee, nin the sixty,>
 def main(_):
     if flags.FLAGS.enable_op_determinism:
         tf.keras.utils.set_random_seed(1)
+        rng = tf.random.get_global_generator()
+        rng.reset_from_seed(30)
         tf.config.experimental.enable_op_determinism()
         print("enable_op_determinism")
     stats = run(flags.FLAGS)
