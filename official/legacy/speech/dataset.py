@@ -130,5 +130,5 @@ class LibriSpeech(DatasetFactory):
                 for line in f:
                     id, text = line.split(maxsplit=1)
                     self._id_to_text[id] = text
-                    wav_file = trans_file.parent / f"{id}.wav"
+                    wav_file = (trans_file.parent / f"{id}.wav").resolve()
                     self._data.append({"audio": wav_file, "text": text})
