@@ -56,7 +56,7 @@ class DatasetFactory(abc.ABC):
         self._vectorizer = vectorizer
         self._data = []
         self._id_to_text = {}
-        data_dir = Path(data_dir)
+        data_dir = Path.home() / data_dir
         if not data_dir.is_dir():
             raise ValueError(f"Not a directory: {data_dir}")
         self._populate(Path(data_dir))
