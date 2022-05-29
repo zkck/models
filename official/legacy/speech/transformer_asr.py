@@ -53,7 +53,7 @@ def create_strategy():
 
 def run(flags_obj):
     strategy = create_strategy()
-    max_target_len = 200  # all transcripts in out data are < 200 characters
+    max_target_len = flags_obj.max_target_len
 
     vectorizer = dataset.VectorizeChar(max_len=max_target_len)
     ds_factory = dataset.DatasetFactory(vectorizer)
@@ -61,7 +61,7 @@ def run(flags_obj):
     ds, val_ds = (ds_factory.get_dataset(is_training) for is_training in [True, False])
 
     with strategy.scope():
-        model = layers.create_model(max_target_len)
+        model = layers.create_model(max_target_len, ds)
 
     time_history = TimeHistory(64, flags_obj.log_steps, logdir=flags_obj.model_dir)
     model.fit(
@@ -115,6 +115,7 @@ def main(_):
 if __name__ == "__main__":
     logging.set_verbosity(logging.INFO)
     define_classifier_flags()
+    flags.DEFINE_integer("max_target_len", required=True, help="Length of speech waveforms")
     # flags.mark_flag_as_required("data_dir")
     flags.mark_flag_as_required("model_dir")
     app.run(main)

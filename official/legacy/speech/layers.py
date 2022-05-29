@@ -277,7 +277,7 @@ class CustomSchedule(keras.optimizers.schedules.LearningRateSchedule):
         return self.calculate_lr(epoch)
 
 
-def create_model(max_target_len):
+def create_model(max_target_len, train_ds):
     model = Transformer(
         num_hid=200,
         num_head=2,
@@ -288,17 +288,18 @@ def create_model(max_target_len):
         num_classes=34,
     )
     loss_fn = tf.keras.losses.CategoricalCrossentropy(
-        from_logits=True,
-        label_smoothing=0.1,
+        from_logits=True, label_smoothing=0.1,
     )
+
     learning_rate = CustomSchedule(
         init_lr=0.00001,
         lr_after_warmup=0.001,
         final_lr=0.00001,
         warmup_epochs=15,
         decay_epochs=85,
-        steps_per_epoch=202,
+        steps_per_epoch=len(train_ds),
     )
     optimizer = keras.optimizers.Adam(learning_rate)
     model.compile(optimizer=optimizer, loss=loss_fn)
+
     return model
