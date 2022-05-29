@@ -108,7 +108,7 @@ class LJSpeech(DatasetFactory):
         #     cache_dir=".",
         # )
 
-        wavs = data_dir.glob("**/*.wav", recursive=True)
+        wavs = data_dir.glob("**/*.wav")
 
         with (data_dir / "metadata.csv").open(encoding="utf-8") as f:
             for line in f:
