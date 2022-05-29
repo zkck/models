@@ -117,6 +117,7 @@ class LJSpeech(DatasetFactory):
                 self._id_to_text[id] = text
 
         for w in wavs:
+            w = str(w.resolve())
             id = w.split("/")[-1].split(".")[0]
             if len(self._id_to_text[id]) < self._vectorizer.max_len:
                 self._data.append({"audio": w, "text": self._id_to_text[id]})
