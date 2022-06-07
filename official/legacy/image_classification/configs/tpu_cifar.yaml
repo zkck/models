@@ -54,7 +54,7 @@ model:
     examples_per_epoch: 50000
 train:
   callbacks:
-    enable_checkpoint_and_export: true
+    enable_checkpoint_and_export: false
   resume_checkpoint: true
   epochs: 500
 evaluation:
