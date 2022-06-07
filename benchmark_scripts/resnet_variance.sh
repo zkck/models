@@ -6,28 +6,6 @@ IMAGENET_DIR=$DATA_DIR/imagenet2012/tfrecords
 
 TRAIN_EPOCHS=90
 
-NUM_IMAGES=1281167,50000
-NUM_CLASSES=1001
-
-DEFAULT_IMAGE_SIZE=224
-
-RESIZE_MIN=256
-
-for arg in "$@"
-do
-    if [ "$arg" == "--test" ]
-    then
-        echo "Using Tiny ImageNet, and reducing number of epochs."
-        IMAGENET_DIR=$DATA_DIR/imagenet-tiny/tfrecords
-        TRAIN_EPOCHS=20
-        NUM_IMAGES=100000,10000
-        NUM_CLASSES=200
-        DEFAULT_IMAGE_SIZE=64
-        RESIZE_MIN=$DEFAULT_IMAGE_SIZE
-    fi
-done
-
-
 args=(
     "--tpu=$TPU_NAME"
     "--data_dir=$IMAGENET_DIR"
@@ -42,10 +20,6 @@ args=(
     "--log_steps=50"
     "--single_l2_loss_op=true"
     "--use_tf_function=true"
-    "--num_images=$NUM_IMAGES"
-    "--num_classes=$NUM_CLASSES"
-    "--default_image_size=$DEFAULT_IMAGE_SIZE"
-    "--resize_min=$RESIZE_MIN"
 )
 echo "Using ${args[@]}"
 
