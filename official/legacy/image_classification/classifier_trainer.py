@@ -415,6 +415,7 @@ def train_and_eval(
       for _ in train_dataset:
         pass
       epoch_runtime_log.append(time.time() - start)
+      print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
     stats = {'epoch_runtime_log': epoch_runtime_log}
 
 
