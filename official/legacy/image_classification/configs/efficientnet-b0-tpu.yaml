@@ -46,7 +46,7 @@ model:
     label_smoothing: 0.1
 train:
   resume_checkpoint: true
-  epochs: 6
+  epochs: 90
   set_epoch_loop: true
 evaluation:
   epochs_between_evals: 1
