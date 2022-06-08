@@ -409,10 +409,13 @@ def train_and_eval(
     # TODO(dankondratyuk): eval and save final test accuracy
     stats = common.build_stats(history, validation_output, callbacks)
   else:
+    print("Starting detached operation...")
     epoch_runtime_log = []
     for _ in range(train_epochs):
       start = time.time()
-      for _ in train_dataset:
+      for i, _ in enumerate(train_dataset):
+        if i % 100 == 0:
+          print(f"Batch {i}")
         pass
       epoch_runtime_log.append(time.time() - start)
       print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
