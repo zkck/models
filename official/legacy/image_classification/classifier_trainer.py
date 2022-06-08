@@ -18,6 +18,7 @@
 import json
 import os
 import pprint
+import time
 from typing import Any, Mapping, Optional, Text, Tuple
 
 from absl import app
@@ -274,6 +275,10 @@ def define_classifier_flags():
       'log_steps',
       default=100,
       help='The interval of steps between logging of batch level stats.')
+  flags.DEFINE_bool(
+      'detached',
+      default=False,
+      help='Just iterate through the dataset.')
 
 
 def serialize_config(params: base_configs.ExperimentConfig, model_dir: str):
@@ -386,22 +391,34 @@ def train_and_eval(
         'validation_freq': params.evaluation.epochs_between_evals,
     }
 
-  history = model.fit(
-      train_dataset,
-      epochs=train_epochs,
-      steps_per_epoch=train_steps,
-      initial_epoch=initial_epoch,
-      callbacks=callbacks,
-      verbose=2,
-      **validation_kwargs)
+  if not flags.FLAGS.detached:
+    history = model.fit(
+        train_dataset,
+        epochs=train_epochs,
+        steps_per_epoch=train_steps,
+        initial_epoch=initial_epoch,
+        callbacks=callbacks,
+        verbose=2,
+        **validation_kwargs)
 
-  validation_output = None
-  if not params.evaluation.skip_eval:
-    validation_output = model.evaluate(
-        validation_dataset, steps=validation_steps, verbose=2)
+    validation_output = None
+    if not params.evaluation.skip_eval:
+      validation_output = model.evaluate(
+          validation_dataset, steps=validation_steps, verbose=2)
 
-  # TODO(dankondratyuk): eval and save final test accuracy
-  stats = common.build_stats(history, validation_output, callbacks)
+    # TODO(dankondratyuk): eval and save final test accuracy
+    stats = common.build_stats(history, validation_output, callbacks)
+  else:
+    epoch_runtime_log = []
+    for _ in range(train_epochs):
+      start = time.time()
+      for _ in train_dataset:
+        pass
+      epoch_runtime_log.append(time.time() - start)
+    stats = {'epoch_runtime_log': epoch_runtime_log}
+
+
+
   return stats
 
 
