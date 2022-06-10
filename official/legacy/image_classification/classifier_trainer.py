@@ -15,6 +15,7 @@
 # Lint as: python3
 """Runs an Image Classification model."""
 
+import itertools
 import json
 import os
 import pprint
@@ -413,7 +414,7 @@ def train_and_eval(
     epoch_runtime_log = []
     for _ in range(train_epochs):
       start = time.time()
-      for i, _ in enumerate(train_dataset):
+      for i, _ in itertools.islice(enumerate(train_dataset), train_steps):
         if i % 100 == 0:
           print(f"Batch {i}")
         pass
