@@ -51,6 +51,7 @@ flags.DEFINE_integer('num_classes', None, "Number of classes", required=True)
 flags.DEFINE_integer('default_image_size', None, "Default image size", required=True)
 flags.DEFINE_integer('resize_min', None, "Lower bound for resizing", required=True)
 flags.DEFINE_boolean('parallel_randomness', False, "Enable parallel randomness", required=False)
+flags.DEFINE_integer('num_parallel_calls', 0, "Lower bound for resizing", required=False)
 
 AUGMENTER = augment.RandAugment()
 
@@ -125,15 +126,18 @@ def process_record_dataset(dataset,
     dataset = dataset.repeat()
 
   # Parses the raw records into images and labels.
+  num_parallel_calls = flags.FLAGS.num_parallel_calls
+  if num_parallel_calls == 0:
+    num_parallel_calls = tf.data.AUTOTUNE
   if flags.FLAGS.parallel_randomness:
     dataset = dataset.deterministic().map(
         lambda value: parse_record_fn(value, is_training, dtype),
-        num_parallel_calls=tf.data.experimental.AUTOTUNE,
+        num_parallel_calls=num_parallel_calls,
         deterministic_randomness=True)
   else:
     dataset = dataset.map(
         lambda value: parse_record_fn(value, is_training, dtype),
-        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        num_parallel_calls=num_parallel_calls)
   dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
 
   # Operations between the final prefetch and the get_next call to the iterator
