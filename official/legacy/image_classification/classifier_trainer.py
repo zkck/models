@@ -434,7 +434,7 @@ class TimedDataset:
     self.elapsed_time = 0
     start = time.time()
     for element in self._dataset:
-      self.elapsed_time += start - time.time()
+      self.elapsed_time += time.time() - start
       yield element
       start = time.time()
 
