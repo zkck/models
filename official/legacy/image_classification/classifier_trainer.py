@@ -414,15 +414,12 @@ def train_and_eval(
     epoch_runtime_log = []
     for _ in range(train_epochs):
       start = time.time()
-      for i, _ in itertools.islice(enumerate(train_dataset), train_steps):
+      for i, _ in enumerate(train_dataset.take(train_steps)):
         if i % 100 == 0:
           print(f"Batch {i}")
-        pass
       epoch_runtime_log.append(time.time() - start)
       print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
     stats = {'epoch_runtime_log': epoch_runtime_log}
-
-
 
   return stats
 
