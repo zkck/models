@@ -415,15 +415,31 @@ def train_and_eval(
     print("Starting detached operation...")
     epoch_runtime_log = []
     for _ in range(train_epochs):
-      start = time.time()
-      for _ in tqdm(train_dataset.take(train_steps)):
+      timed_dataset = TimedDataset(train_dataset.take(train_steps))
+      for _ in tqdm(timed_dataset):
         pass
-      epoch_runtime_log.append(time.time() - start)
+      epoch_runtime_log.append(timed_dataset.elapsed_time)
       print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
     stats = {'epoch_runtime_log': epoch_runtime_log}
 
   return stats
 
+class TimedDataset:
+
+  def __init__(self, dataset) -> None:
+      self._dataset = dataset
+      self.elapsed_time = None
+
+  def __iter__(self):
+    self.elapsed_time = 0
+    start = time.time()
+    for element in self._dataset:
+      self.elapsed_time += start - time.time()
+      yield element
+      start = time.time()
+
+  def __len__(self):
+    return len(self._dataset)
 
 def export(params: base_configs.ExperimentConfig):
   """Runs the model export functionality."""
