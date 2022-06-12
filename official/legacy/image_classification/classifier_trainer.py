@@ -315,10 +315,10 @@ def train_and_eval(
   label_smoothing = params.model.loss.label_smoothing
   one_hot = label_smoothing and label_smoothing > 0
 
-  # builders = _get_dataset_builders(params, strategy, one_hot)
-  builders = _get_dataset_builders(params, None, one_hot)
+  builders = _get_dataset_builders(params, strategy, one_hot)
   datasets = [
-      builder.build(strategy) if builder else None for builder in builders
+      # builder.build(strategy) if builder else None for builder in builders
+      builder.build() if builder else None for builder in builders
   ]
 
   # Unpack datasets and builders based on train/val/test splits
