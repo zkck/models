@@ -11,4 +11,5 @@ python3 classifier_trainer.py \
         --data_dir=$DATA_DIR/imagenet2012/tfrecords \
         --config_file=configs/tpu.yaml \
         --detached \
+        --num_epochs=5 \
         "$@"

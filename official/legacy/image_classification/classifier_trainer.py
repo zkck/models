@@ -176,6 +176,8 @@ def _get_params_from_flags(flags_obj: flags.FlagValues):
           },
       },
   }
+  if flags_obj.num_epochs:
+    flags_overrides['train']['epochs'] = flags_obj.num_epochs
 
   overriding_configs = (flags_obj.config_file, flags_obj.params_override,
                         flags_overrides)
@@ -281,6 +283,10 @@ def define_classifier_flags():
       'detached',
       default=False,
       help='Just iterate through the dataset.')
+  flags.DEFINE_integer(
+      'num_epochs',
+      default=0,
+      help='Number of training epochs.')
 
 
 def serialize_config(params: base_configs.ExperimentConfig, model_dir: str):
