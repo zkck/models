@@ -26,6 +26,7 @@ from absl import app
 from absl import flags
 from absl import logging
 import tensorflow as tf
+from tqdm import tqdm
 from official.common import distribute_utils
 from official.legacy.image_classification import callbacks as custom_callbacks
 from official.legacy.image_classification import dataset_factory
@@ -414,9 +415,8 @@ def train_and_eval(
     epoch_runtime_log = []
     for _ in range(train_epochs):
       start = time.time()
-      for i, _ in enumerate(train_dataset.take(train_steps)):
-        if i % 100 == 0:
-          print(f"Batch {i}")
+      for _ in tqdm(train_dataset.take(train_steps)):
+        pass
       epoch_runtime_log.append(time.time() - start)
       print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
     stats = {'epoch_runtime_log': epoch_runtime_log}
