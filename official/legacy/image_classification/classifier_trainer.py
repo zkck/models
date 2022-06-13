@@ -287,6 +287,10 @@ def define_classifier_flags():
       'num_epochs',
       default=0,
       help='Number of training epochs.')
+  flags.DEFINE_bool(
+      'no_strategy',
+      default=False,
+      help='Do not create a strategy.')
 
 
 def serialize_config(params: base_configs.ExperimentConfig, model_dir: str):
@@ -307,11 +311,14 @@ def train_and_eval(
                                      params.runtime.task_index)
 
   # Note: for TPUs, strategy and scope should be created before the dataset
-  strategy = strategy_override or distribute_utils.get_distribution_strategy(
-      distribution_strategy=params.runtime.distribution_strategy,
-      all_reduce_alg=params.runtime.all_reduce_alg,
-      num_gpus=params.runtime.num_gpus,
-      tpu_address=params.runtime.tpu)
+  if flags.FLAGS.no_strategy:
+    strategy = None
+  else:
+    strategy = strategy_override or distribute_utils.get_distribution_strategy(
+        distribution_strategy=params.runtime.distribution_strategy,
+        all_reduce_alg=params.runtime.all_reduce_alg,
+        num_gpus=params.runtime.num_gpus,
+        tpu_address=params.runtime.tpu)
 
   strategy_scope = distribute_utils.get_strategy_scope(strategy)
 
@@ -323,8 +330,7 @@ def train_and_eval(
 
   builders = _get_dataset_builders(params, strategy, one_hot)
   datasets = [
-      # builder.build(strategy) if builder else None for builder in builders
-      builder.build() if builder else None for builder in builders
+      builder.build(strategy) if builder else None for builder in builders
   ]
 
   # Unpack datasets and builders based on train/val/test splits
