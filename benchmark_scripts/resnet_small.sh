@@ -10,4 +10,5 @@ python3 classifier_trainer.py \
         --model_dir=$MODEL_DIR \
         --data_dir=$DATA_DIR/imagenet2012/tfrecords \
         --config_file=configs/tpu.yaml \
+        --num_epochs=6 \
         "$@"
