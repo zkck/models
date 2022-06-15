@@ -427,10 +427,10 @@ def train_and_eval(
     print("Starting detached operation...")
     epoch_runtime_log = []
     for _ in range(train_epochs):
-      timed_dataset = TimedDataset(train_dataset.take(train_steps))
-      for _ in tqdm(timed_dataset):
+      start = time.time()
+      for _ in itertools.islice(train_dataset, train_steps):
         pass
-      epoch_runtime_log.append(timed_dataset.elapsed_time)
+      epoch_runtime_log.append(time.time() - start)
       print(f"Epoch ran for {epoch_runtime_log[-1]} seconds.")
     stats = {'epoch_runtime_log': epoch_runtime_log}
 
