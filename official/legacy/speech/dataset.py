@@ -133,4 +133,5 @@ class LibriSpeech(DatasetFactory):
                     id, text = line.split(maxsplit=1)
                     self._id_to_text[id] = text
                     wav_file = (trans_file.parent / f"{id}.wav").resolve()
-                    self._data.append({"audio": str(wav_file), "text": text})
+                    if len(text) < self._vectorizer.max_len:
+                        self._data.append({"audio": str(wav_file), "text": text})
