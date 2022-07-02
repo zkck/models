@@ -69,7 +69,7 @@ def run(flags_obj):
         model = layers.create_model(max_target_len, ds)
 
     time_history = TimeHistory(64, flags_obj.log_steps, logdir=flags_obj.model_dir)
-    model.fit(
+    history = model.fit(
         ds,
         validation_data=val_ds,
         callbacks=[
@@ -85,10 +85,12 @@ def run(flags_obj):
         # steps_per_epoch=202,  # from observation
     )
 
-    return {
+    stats = {
         "epoch_runtime_log": time_history.epoch_runtime_log,
         "batch_runtime_log": time_history.batch_runtime_log,
     }
+    stats.update(history.history)
+    return stats
 
 
 """
