@@ -69,16 +69,17 @@ def run(flags_obj):
         model = layers.create_model(max_target_len, ds)
 
     time_history = TimeHistory(64, flags_obj.log_steps, logdir=flags_obj.model_dir)
+    accuracy = callbacks.WER(
+        next(iter(val_ds)),
+        vectorizer.get_vocabulary(),
+        target_start_token_idx=2,
+        target_end_token_idx=3,
+    )
     history = model.fit(
         ds,
         validation_data=val_ds,
         callbacks=[
-            callbacks.WER(
-                next(iter(val_ds)),
-                vectorizer.get_vocabulary(),
-                target_start_token_idx=2,
-                target_end_token_idx=3,
-            ),
+            accuracy,
             time_history,
         ],
         epochs=2,
@@ -86,6 +87,7 @@ def run(flags_obj):
     )
 
     stats = {
+        "accuracy": accuracy.error_rates,
         "epoch_runtime_log": time_history.epoch_runtime_log,
         "batch_runtime_log": time_history.batch_runtime_log,
     }
