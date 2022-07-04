@@ -12,7 +12,6 @@ architecture:
 spinenet:
   model_id: 49
 train:
-  total_steps: 1000
   train_file_pattern: ${TRAIN_FILE_PATTERN?}
 eval:
   val_json_file: ${VAL_JSON_FILE?}
