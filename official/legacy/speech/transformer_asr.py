@@ -73,12 +73,12 @@ def run(flags_obj):
         ds,
         validation_data=val_ds,
         callbacks=[
-            # callbacks.DisplayOutputs(
-            #     next(iter(val_ds)),
-            #     vectorizer.get_vocabulary(),
-            #     target_start_token_idx=2,
-            #     target_end_token_idx=3,
-            # ),
+            callbacks.WER(
+                next(iter(val_ds)),
+                vectorizer.get_vocabulary(),
+                target_start_token_idx=2,
+                target_end_token_idx=3,
+            ),
             time_history,
         ],
         epochs=2,

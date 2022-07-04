@@ -1,6 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
 
+from official.legacy.speech.metrics.error_rates import ErrorRate
+from official.legacy.speech.utils.metric_util import wer
+
 
 class DisplayOutputs(keras.callbacks.Callback):
     def __init__(
@@ -36,3 +39,43 @@ class DisplayOutputs(keras.callbacks.Callback):
                     break
             print(f"target:     {target_text.replace('-','')}")
             print(f"prediction: {prediction}\n")
+
+
+class WER(keras.callbacks.Callback):
+    def __init__(
+        self, batch, idx_to_token, target_start_token_idx=27, target_end_token_idx=28
+    ):
+        """Displays a batch of outputs after every epoch
+
+        Args:
+            batch: A test batch containing the keys "source" and "target"
+            idx_to_token: A List containing the vocabulary tokens corresponding to their indices
+            target_start_token_idx: A start token index in the target vocabulary
+            target_end_token_idx: An end token index in the target vocabulary
+        """
+        self.batch = batch
+        self.target_start_token_idx = target_start_token_idx
+        self.target_end_token_idx = target_end_token_idx
+        self.idx_to_char = idx_to_token
+        self.error_rates = []
+
+    def on_epoch_end(self, epoch, logs=None):
+        error_rate = ErrorRate(wer, name="wer")
+        source = self.batch["source"]
+        target = self.batch["target"].numpy()
+        bs = tf.shape(source)[0]
+        preds = self.model.generate(source, self.target_start_token_idx)
+        preds = preds.numpy()
+        for i in range(bs):
+            target_text = "".join([self.idx_to_char[_] for _ in target[i, :]])
+            prediction = ""
+            for idx in preds[i, :]:
+                prediction += self.idx_to_char[idx]
+                if idx == self.target_end_token_idx:
+                    break
+            target_text = target_text.replace('-','')
+            error_rate.update_state(
+                decode=tf.convert_to_tensor([prediction], dtype=tf.string),
+                target=tf.convert_to_tensor([target_text], dtype=tf.string)
+            )
+        self.error_rates.append(error_rate.result().numpy())
