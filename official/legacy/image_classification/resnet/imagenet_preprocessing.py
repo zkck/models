@@ -114,7 +114,7 @@ def process_record_dataset(dataset,
   kwargs = {}
   if _PARALLEL_RANDOMNESS:
     dataset = dataset.deterministic()
-    kwargs['reproducible_randomness'] = True
+    kwargs['deterministic_randomness'] = True
   dataset = dataset.map(
       lambda value: parse_record_fn(value, is_training, dtype),
       num_parallel_calls=tf.data.experimental.AUTOTUNE,
