@@ -123,7 +123,7 @@ def get_callbacks(pruning_method=None,
 
   if FLAGS.enable_tensorboard:
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
-        log_dir=FLAGS.model_dir, profile_batch=FLAGS.profile_steps)
+        log_dir=FLAGS.model_dir)
     callbacks.append(tensorboard_callback)
 
   is_pruning_enabled = pruning_method is not None

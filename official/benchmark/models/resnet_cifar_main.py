@@ -31,6 +31,9 @@ from official.common import distribute_utils
 from official.legacy.image_classification.resnet import common
 from official.utils.flags import core as flags_core
 from official.utils.misc import keras_utils
+# Extra
+import json
+from pathlib import Path
 
 
 LR_SCHEDULE = [  # (multiplier, epoch to start) tuples
@@ -142,10 +145,12 @@ def run(flags_obj):
                    else 'channels_last')
   tf.keras.backend.set_image_data_format(data_format)
 
+  print(f"Using TPU {flags_obj.tpu}")
   strategy = distribute_utils.get_distribution_strategy(
       distribution_strategy=flags_obj.distribution_strategy,
       num_gpus=flags_obj.num_gpus,
       all_reduce_alg=flags_obj.all_reduce_alg,
+      tpu_address=flags_obj.tpu,
       num_packs=flags_obj.num_packs)
 
   if strategy:
@@ -263,6 +268,8 @@ def run(flags_obj):
     no_dist_strat_device.__exit__()
 
   stats = common.build_stats(history, eval_output, callbacks)
+  with Path(flags_obj.model_dir, "stats.json").open('w') as f:
+      json.dump(stats, f, default=str)
   return stats
 
 
