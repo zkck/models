@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 from absl import logging
 import tensorflow as tf
@@ -87,10 +88,16 @@ def preprocess_image(image, is_training):
     image = tf.image.resize_with_crop_or_pad(image, HEIGHT + 8, WIDTH + 8)
 
     # Randomly crop a [HEIGHT, WIDTH] section of the image.
-    image = tf.image.random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
+    if _PARALLEL_RANDOMNESS:
+      image = tf.image.deterministic_random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
+    else:
+      image = tf.image.random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
 
     # Randomly flip the image horizontally.
-    image = tf.image.random_flip_left_right(image)
+    if _PARALLEL_RANDOMNESS:
+      image = tf.image.deterministic_random_flip_left_right(image)
+    else:
+      image = tf.image.random_flip_left_right(image)
 
   # Subtract off the mean and divide by the variance of the pixels.
   image = tf.image.per_image_standardization(image)

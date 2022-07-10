@@ -36,6 +36,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 from absl import logging
 import tensorflow as tf
@@ -110,6 +111,8 @@ def process_record_dataset(dataset,
     dataset = dataset.repeat()
 
   # Parses the raw records into images and labels.
+  if _PARALLEL_RANDOMNESS:
+    dataset = dataset.deterministic()
   dataset = dataset.map(
       lambda value: parse_record_fn(value, is_training, dtype),
       num_parallel_calls=tf.data.experimental.AUTOTUNE)
