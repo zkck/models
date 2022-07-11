@@ -113,8 +113,8 @@ class LearningRateBatchScheduler(tf.keras.callbacks.Callback):
 
 def hash_dataset(dataset):
   h = []
-  for e in dataset:
-    arr = e.numpy()
+  for image, _label in dataset:
+    arr = image.numpy()
     arr.flags.writeable = False
     h.append(hash(arr.data))
   return h
