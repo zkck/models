@@ -112,7 +112,10 @@ class LearningRateBatchScheduler(tf.keras.callbacks.Callback):
           'change learning rate to %s.', self.epochs, batch, lr)
 
 
-def hash_dataset(dataset):
+def hash_dataset(dataset, steps_per_epoch):
+  from tqdm import tqdm
+  dataset = itertools.islice(dataset, steps_per_epoch)
+  dataset = tqdm(dataset)
   h = []
   for image, _label in dataset:
     arr = image.numpy()
@@ -206,10 +209,7 @@ def run(flags_obj):
     cifar_preprocessing.NUM_IMAGES['train'] // flags_obj.batch_size)
 
   if flags_obj.check_hashes:
-    from tqdm import tqdm
-    train_input_dataset = itertools.islice(train_input_dataset, steps_per_epoch)
-    train_input_dataset = tqdm(train_input_dataset)
-    initial_hash = hash_dataset(train_input_dataset)
+    initial_hash = hash_dataset(train_input_dataset, steps_per_epoch)
     stats = {
       "epochs_match": True,
       "epochs_match_sorted": True,
@@ -218,7 +218,7 @@ def run(flags_obj):
     }
     for i in range(flags_obj.train_epochs):
       print(f"Epoch {i + 1}/{flags_obj.train_epochs}")
-      epoch_hash = hash_dataset(train_input_dataset)
+      epoch_hash = hash_dataset(train_input_dataset, steps_per_epoch)
       stats["epochs_match"] &= epoch_hash == initial_hash
       stats["epochs_match_sorted"] &= sorted(epoch_hash) == sorted(initial_hash)
       stats["epochs_match_length"] &= len(epoch_hash) == len(initial_hash)
