@@ -132,9 +132,9 @@ def process_record_dataset(dataset,
   # on how many devices are present.
   dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-  options = tf.data.Options()
-  options.experimental_slack = tf_data_experimental_slack
-  dataset = dataset.with_options(options)
+  # options = tf.data.Options()
+  # options.experimental_slack = tf_data_experimental_slack
+  # dataset = dataset.with_options(options)
 
   return dataset
 
