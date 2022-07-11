@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import hashlib
 
 # Import libraries
 from absl import app
@@ -110,6 +111,16 @@ class LearningRateBatchScheduler(tf.keras.callbacks.Callback):
           'change learning rate to %s.', self.epochs, batch, lr)
 
 
+def hash_dataset(dataset):
+  h = []
+  for e in dataset:
+    arr = e.numpy()
+    arr.flags.writeable = False
+    h.append(hash(arr.data))
+  return h
+
+
+
 def run(flags_obj):
   """Run ResNet Cifar-10 training and eval loop using native Keras APIs.
 
@@ -189,6 +200,15 @@ def run(flags_obj):
       # layer, which triggers tf.where and leads to extra memory copy of input
       # sizes between host and GPU.
       drop_remainder=(not flags_obj.enable_get_next_as_optional))
+
+  if flags_obj.check_hashes:
+    initial_hash = hash_dataset(train_input_dataset)
+    for _ in range(train_epochs):
+      epoch_hash = hash_dataset(train_input_dataset)
+      if epoch_hash != initial_hash:
+        return {"epochs_match": False}
+    return {"epochs_match": True}
+
 
   eval_input_dataset = None
   if not flags_obj.skip_eval:
