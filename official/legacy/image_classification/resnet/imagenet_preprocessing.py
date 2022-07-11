@@ -96,13 +96,15 @@ def process_record_dataset(dataset,
     Dataset of (image, label) pairs ready for iteration.
   """
   # Defines a specific size thread pool for tf.data operations.
+  options = tf.data.Options()
+  # ZCK:
+  options.deterministic = True
   if datasets_num_private_threads:
-    options = tf.data.Options()
     options.experimental_threading.private_threadpool_size = (
         datasets_num_private_threads)
-    dataset = dataset.with_options(options)
     logging.info('datasets_num_private_threads: %s',
                  datasets_num_private_threads)
+  dataset = dataset.with_options(options)
 
   kwargs = {}
   if _PARALLEL_RANDOMNESS:
