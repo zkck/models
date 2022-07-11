@@ -210,8 +210,8 @@ def run(flags_obj):
     train_input_dataset = itertools.islice(train_input_dataset, steps_per_epoch)
     train_input_dataset = tqdm(train_input_dataset)
     initial_hash = hash_dataset(train_input_dataset)
-    for i in range(train_epochs):
-      print(f"Epoch {i + 1}/{train_epochs}")
+    for i in range(flags_obj.train_epochs):
+      print(f"Epoch {i + 1}/{flags_obj.train_epochs}")
       epoch_hash = hash_dataset(train_input_dataset)
       if epoch_hash != initial_hash:
         return {"epochs_match": False}
