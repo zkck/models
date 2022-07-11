@@ -202,6 +202,9 @@ def run(flags_obj):
       # sizes between host and GPU.
       drop_remainder=(not flags_obj.enable_get_next_as_optional))
 
+  steps_per_epoch = (
+    cifar_preprocessing.NUM_IMAGES['train'] // flags_obj.batch_size)
+
   if flags_obj.check_hashes:
     from tqdm import tqdm
     train_input_dataset = itertools.islice(train_input_dataset, steps_per_epoch)
@@ -223,8 +226,6 @@ def run(flags_obj):
         batch_size=flags_obj.batch_size,
         parse_record_fn=cifar_preprocessing.parse_record)
 
-  steps_per_epoch = (
-      cifar_preprocessing.NUM_IMAGES['train'] // flags_obj.batch_size)
   lr_schedule = 0.1
   if flags_obj.use_tensor_lr:
     initial_learning_rate = common.BASE_LEARNING_RATE * flags_obj.batch_size / 128
