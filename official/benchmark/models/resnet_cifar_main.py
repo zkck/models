@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import hashlib
+import itertools
 
 # Import libraries
 from absl import app
@@ -203,6 +204,7 @@ def run(flags_obj):
 
   if flags_obj.check_hashes:
     from tqdm import tqdm
+    train_input_dataset = itertools.islice(train_input_dataset, steps_per_epoch)
     train_input_dataset = tqdm(train_input_dataset)
     initial_hash = hash_dataset(train_input_dataset)
     for i in range(train_epochs):
