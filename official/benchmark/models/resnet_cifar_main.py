@@ -202,8 +202,11 @@ def run(flags_obj):
       drop_remainder=(not flags_obj.enable_get_next_as_optional))
 
   if flags_obj.check_hashes:
+    from tqdm import tqdm
+    train_input_dataset = tqdm(train_input_dataset)
     initial_hash = hash_dataset(train_input_dataset)
-    for _ in range(train_epochs):
+    for i in range(train_epochs):
+      print(f"Epoch {i + 1}/{train_epochs}")
       epoch_hash = hash_dataset(train_input_dataset)
       if epoch_hash != initial_hash:
         return {"epochs_match": False}
