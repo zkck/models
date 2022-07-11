@@ -188,6 +188,10 @@ def build_stats(history, eval_output, callbacks):
   return stats
 
 
+def define_determinism_flags():
+  flags.DEFINE_integer(name='seed', default=0, help='Seed for Keras/TensorFlow')
+  flags.DEFINE_boolean(name='enable_op_determinism', default=False, help='Enable op determinism')
+
 def define_keras_flags(model=False,
                        optimizer=False,
                        pretrained_filepath=False):
@@ -416,3 +420,11 @@ def set_cudnn_batchnorm_mode():
     os.environ['TF_USE_CUDNN_BATCHNORM_SPATIAL_PERSISTENT'] = '1'
   else:
     os.environ.pop('TF_USE_CUDNN_BATCHNORM_SPATIAL_PERSISTENT', None)
+
+def set_determinism_mode(flags_obj):
+  """Call determinism functions from flag arguments.
+  """
+  if flags_obj.seed:
+    tf.keras.utils.set_random_seed(flags_obj.seed)
+  if flags_obj.enable_op_determinism:
+    tf.config.experimental.enable_op_determinism()

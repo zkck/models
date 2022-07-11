@@ -122,6 +122,8 @@ def run(flags_obj):
   Returns:
     Dictionary of training and eval stats.
   """
+  common.set_determinism_mode(flags_obj)
+
   keras_utils.set_session_config(
       enable_xla=flags_obj.enable_xla)
 
@@ -289,4 +291,5 @@ def main(_):
 if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   define_cifar_flags()
+  common.define_determinism_flags()
   app.run(main)
