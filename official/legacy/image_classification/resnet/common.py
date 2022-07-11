@@ -425,6 +425,8 @@ def set_determinism_mode(flags_obj):
   """Call determinism functions from flag arguments.
   """
   if flags_obj.seed:
+    print(f"ZCK: Setting seed={flags_obj.seed}")
     tf.keras.utils.set_random_seed(flags_obj.seed)
   if flags_obj.enable_op_determinism:
+    print(f"ZCK: Enabling op determinism")
     tf.config.experimental.enable_op_determinism()
