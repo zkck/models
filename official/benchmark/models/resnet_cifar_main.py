@@ -116,7 +116,7 @@ def hash_dataset(dataset):
   for image, _label in dataset:
     arr = image.numpy()
     arr.flags.writeable = False
-    h.append(hash(arr.data))
+    h.append(hash(arr.data.tobytes()))
   return h
 
 
