@@ -32,6 +32,22 @@ BATCH_NORM_EPSILON = 1e-5
 L2_WEIGHT_DECAY = 2e-4
 
 
+class DeterministicInitializerFactory:
+
+  _INITIALIZERS = {
+    'he_normal': tf.keras.initializers.HeNormal
+  }
+
+  def __init__(self, seed) -> None:
+      self.g = tf.random.Generator.from_seed(seed)
+
+  def make_initializer(self, initializer_type):
+      if initializer_type not in self._INITIALIZERS:
+        raise ValueError(f"Initializer type {initializer_type} not found.")
+      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]))
+
+_INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
+
 def identity_building_block(input_tensor,
                             kernel_size,
                             filters,
@@ -65,7 +81,7 @@ def identity_building_block(input_tensor,
       kernel_size,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -82,7 +98,7 @@ def identity_building_block(input_tensor,
       kernel_size,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name=conv_name_base + '2b')(
           x)
@@ -138,7 +154,7 @@ def conv_building_block(input_tensor,
       strides=strides,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -155,7 +171,7 @@ def conv_building_block(input_tensor,
       kernel_size,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name=conv_name_base + '2b')(
           x)
@@ -170,7 +186,7 @@ def conv_building_block(input_tensor,
       filters2, (1, 1),
       strides=strides,
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name=conv_name_base + '1')(
           input_tensor)
@@ -266,7 +282,7 @@ def resnet(num_blocks, classes=10, training=None):
       strides=(1, 1),
       padding='valid',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name='conv1')(
           x)
@@ -315,7 +331,7 @@ def resnet(num_blocks, classes=10, training=None):
       classes,
       activation='softmax',
       kernel_initializer=tf.keras.initializers.RandomNormal(
-          stddev=0.01),
+          stddev=0.01, seed=42),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       bias_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name='fc10')(
