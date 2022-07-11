@@ -194,7 +194,7 @@ def run(flags_obj):
     input_fn = cifar_preprocessing.input_fn
 
   train_input_dataset = input_fn(
-      is_training=True,
+      is_training=False,
       data_dir=flags_obj.data_dir,
       batch_size=flags_obj.batch_size,
       parse_record_fn=cifar_preprocessing.parse_record,
