@@ -191,6 +191,7 @@ def build_stats(history, eval_output, callbacks):
 def define_determinism_flags():
   flags.DEFINE_integer(name='seed', default=0, help='Seed for Keras/TensorFlow')
   flags.DEFINE_boolean(name='enable_op_determinism', default=False, help='Enable op determinism')
+  flags.DEFINE_boolean(name='check_hashes', default=False, help='Check hashes')
 
 def define_keras_flags(model=False,
                        optimizer=False,
