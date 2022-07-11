@@ -104,6 +104,11 @@ def process_record_dataset(dataset,
     logging.info('datasets_num_private_threads: %s',
                  datasets_num_private_threads)
 
+  kwargs = {}
+  if _PARALLEL_RANDOMNESS:
+    dataset = dataset.deterministic()
+    kwargs['deterministic_randomness'] = True
+
   if is_training:
     # Shuffles records before repeating to respect epoch boundaries.
     dataset = dataset.shuffle(buffer_size=shuffle_buffer)
@@ -111,10 +116,6 @@ def process_record_dataset(dataset,
     # dataset = dataset.repeat()
 
   # Parses the raw records into images and labels.
-  kwargs = {}
-  if _PARALLEL_RANDOMNESS:
-    dataset = dataset.deterministic()
-    kwargs['deterministic_randomness'] = True
   dataset = dataset.map(
       lambda value: parse_record_fn(value, is_training, dtype),
       num_parallel_calls=tf.data.experimental.AUTOTUNE,
