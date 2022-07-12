@@ -114,7 +114,7 @@ class LearningRateBatchScheduler(tf.keras.callbacks.Callback):
 
 def hash_dataset(dataset, steps_per_epoch):
   from tqdm import tqdm
-  # dataset = itertools.islice(dataset, steps_per_epoch)
+  dataset = itertools.islice(dataset, steps_per_epoch)
   dataset = tqdm(dataset)
   h = []
   for image, _label in dataset:
