@@ -113,7 +113,7 @@ def process_record_dataset(dataset,
 
   if is_training:
     # Shuffles records before repeating to respect epoch boundaries.
-    dataset = dataset.shuffle(buffer_size=shuffle_buffer, seed=22)
+    dataset = dataset.shuffle(buffer_size=shuffle_buffer, seed=22, reshuffle_each_iteration=False)
     # Repeats the dataset for the number of epochs to train.
     # dataset = dataset.repeat()
 
