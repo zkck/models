@@ -1,5 +1,6 @@
 #!/bin/bash
 export ZCK_PARALLEL_RANDOMNESS=1
+export PYTHONHASHSEED=1
 cd official/benchmark/models
 
 for i in {1..5}
