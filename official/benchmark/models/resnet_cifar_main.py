@@ -216,6 +216,7 @@ def run(flags_obj):
       "epochs_match_length": True,
       "lengths": [len(initial_hash)],
       "hashes": [hash(tuple(initial_hash))],
+      "hashes_sorted": [hash(tuple(sorted(initial_hash)))],
     }
     for i in range(flags_obj.train_epochs):
       print(f"Epoch {i + 1}/{flags_obj.train_epochs}")
@@ -225,6 +226,7 @@ def run(flags_obj):
       stats["epochs_match_length"] &= len(epoch_hash) == len(initial_hash)
       stats["lengths"].append(len(epoch_hash))
       stats["hashes"].append(hash(tuple(epoch_hash)))
+      stats["hashes_sorted"].append(hash(tuple(sorted(epoch_hash))))
     return stats
 
 
