@@ -14,5 +14,6 @@ do
             --model_dir="$MODEL_DIR/run$i" \
             --data_dir=$DATA_DIR/imagenet2012/tfrecords \
             --config_file=configs/tpu.yaml \
-            "$@"
+            --seed=1 \
+            --enable_op_determinism
 done
