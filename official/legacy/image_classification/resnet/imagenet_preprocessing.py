@@ -39,6 +39,7 @@ import os
 _PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 from absl import logging
+from absl import flags
 import tensorflow as tf
 
 DEFAULT_IMAGE_SIZE = 224
@@ -396,7 +397,8 @@ def _decode_crop_and_flip(image_buffer, bbox, num_channels):
       aspect_ratio_range=[0.75, 1.33],
       area_range=[0.05, 1.0],
       max_attempts=100,
-      use_image_if_no_bounding_boxes=True)
+      use_image_if_no_bounding_boxes=True,
+      seed=int(flags.FLAGS.enable_op_determinism))
   bbox_begin, bbox_size, _ = sample_distorted_bounding_box
 
   # Reassemble the bounding box in the format the crop op requires.
