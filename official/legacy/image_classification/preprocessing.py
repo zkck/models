@@ -20,7 +20,10 @@ from __future__ import print_function
 from typing import List, Optional, Text, Tuple
 import tensorflow as tf
 from official.legacy.image_classification import augment
+from absl import flags
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 # Calculated from the ImageNet training set
 MEAN_RGB = (0.485 * 255, 0.456 * 255, 0.406 * 255)
@@ -224,15 +227,26 @@ def decode_crop_and_flip(image_bytes: tf.Tensor) -> tf.Tensor:
   bbox = tf.constant([0.0, 0.0, 1.0, 1.0], dtype=tf.float32, shape=[1, 1, 4])
   shape = (tf.shape(image_bytes) if decoded
            else tf.image.extract_jpeg_shape(image_bytes))
-  sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
-      shape,
-      bounding_boxes=bbox,
-      min_object_covered=0.1,
-      aspect_ratio_range=[0.75, 1.33],
-      area_range=[0.05, 1.0],
-      max_attempts=100,
-      use_image_if_no_bounding_boxes=True,
-      seed=int(flags.FLAGS.enable_op_determinism))
+  if _PARALLEL_RANDOMNESS:
+    sample_distorted_bounding_box = tf.image.deterministic_sample_distorted_bounding_box(
+        shape,
+        bounding_boxes=bbox,
+        min_object_covered=0.1,
+        aspect_ratio_range=[0.75, 1.33],
+        area_range=[0.05, 1.0],
+        max_attempts=100,
+        use_image_if_no_bounding_boxes=True,
+        seed=int(flags.FLAGS.enable_op_determinism))
+  else:
+    sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
+        shape,
+        bounding_boxes=bbox,
+        min_object_covered=0.1,
+        aspect_ratio_range=[0.75, 1.33],
+        area_range=[0.05, 1.0],
+        max_attempts=100,
+        use_image_if_no_bounding_boxes=True,
+        seed=int(flags.FLAGS.enable_op_determinism))
   bbox_begin, bbox_size, _ = sample_distorted_bounding_box
 
   # Reassemble the bounding box in the format the crop op requires.
@@ -253,7 +267,10 @@ def decode_crop_and_flip(image_bytes: tf.Tensor) -> tf.Tensor:
                                             channels=3)
 
   # Flip to add a little more random distortion in.
-  cropped = tf.image.random_flip_left_right(cropped)
+  if _PARALLEL_RANDOMNESS:
+    cropped = tf.image.deterministic_random_flip_left_right(cropped)
+  else:
+    cropped = tf.image.random_flip_left_right(cropped)
   return cropped
 
 
