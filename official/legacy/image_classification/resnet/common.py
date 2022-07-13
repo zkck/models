@@ -180,6 +180,7 @@ def build_stats(history, eval_output, callbacks):
   for callback in callbacks:
     if isinstance(callback, keras_utils.TimeHistory):
       timestamp_log = callback.timestamp_log
+      stats['epoch_runtime_log'] = callback.epoch_runtime_log
       stats['step_timestamp_log'] = timestamp_log
       stats['train_finish_time'] = callback.train_finish_time
       if callback.epoch_runtime_log:
