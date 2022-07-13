@@ -390,7 +390,7 @@ def train_and_eval(
   history = model.fit(
       train_dataset,
       epochs=train_epochs,
-      steps_per_epoch=train_steps,
+      # steps_per_epoch=train_steps,
       initial_epoch=initial_epoch,
       callbacks=callbacks,
       verbose=2,

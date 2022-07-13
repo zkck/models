@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 import dataclasses
 import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 from typing import Any, List, Mapping, Optional, Tuple, Union
 
 from absl import logging
@@ -411,12 +412,12 @@ class DatasetBuilder:
           'num_input_pipelines=%d', self.input_context.num_input_pipelines,
           self.input_context.input_pipeline_id)
 
-    if self.is_training and self.config.builder == 'records':
-      # Shuffle the input files.
-      dataset.shuffle(buffer_size=self.config.file_shuffle_buffer_size)
+    # if self.is_training and self.config.builder == 'records':
+    #   # Shuffle the input files.
+    #   dataset.shuffle(buffer_size=self.config.file_shuffle_buffer_size)
 
-    if self.is_training and not self.config.cache:
-      dataset = dataset.repeat()
+    # if self.is_training and not self.config.cache:
+    #   dataset = dataset.repeat()
 
     if self.config.builder == 'records':
       # Read the data from disk in parallel
@@ -429,9 +430,14 @@ class DatasetBuilder:
     if self.config.cache:
       dataset = dataset.cache()
 
+    kwargs = {}
+    if _PARALLEL_RANDOMNESS:
+      dataset = dataset.deterministic()
+      kwargs['deterministic_randomness'] = True
+
     if self.is_training:
-      dataset = dataset.shuffle(self.config.shuffle_buffer_size)
-      dataset = dataset.repeat()
+      dataset = dataset.shuffle(self.config.shuffle_buffer_size, seed=22)
+      # dataset = dataset.repeat()
 
     # Parse, pre-process, and batch the data in parallel
     if self.config.builder == 'records':
@@ -439,7 +445,7 @@ class DatasetBuilder:
     else:
       preprocess = self.preprocess
     dataset = dataset.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE, **kwargs)
 
     if self.input_context and self.config.num_devices > 1:
       if not self.config.use_per_replica_batch_size:
