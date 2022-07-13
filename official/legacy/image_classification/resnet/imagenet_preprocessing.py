@@ -334,9 +334,9 @@ def input_fn(is_training,
     dataset = dataset.shard(input_context.num_input_pipelines,
                             input_context.input_pipeline_id)
 
-  if is_training:
-    # Shuffle the input files
-    dataset = dataset.shuffle(buffer_size=_NUM_TRAIN_FILES)
+  # if is_training:
+  #   # Shuffle the input files
+  #   dataset = dataset.shuffle(buffer_size=_NUM_TRAIN_FILES)
 
   # Convert to individual records.
   # cycle_length = 10 means that up to 10 files will be read and deserialized in
