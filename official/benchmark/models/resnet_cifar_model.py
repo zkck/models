@@ -32,6 +32,12 @@ BATCH_NORM_EPSILON = 1e-5
 L2_WEIGHT_DECAY = 2e-4
 
 
+class RandomNormal(tf.keras.initializers.RandomNormal):
+
+    def __init__(self, mean=0.0, stddev=0.05, seed=None):
+      super().__init__(mean=mean, stddev=stddev, seed=seed)
+      self._random_generator._force_generator = True
+
 
 class HeNormal(tf.keras.initializers.VarianceScaling):
   """He normal initializer.
@@ -69,16 +75,17 @@ class HeNormal(tf.keras.initializers.VarianceScaling):
 class DeterministicInitializerFactory:
 
   _INITIALIZERS = {
-    'he_normal': HeNormal
+    'he_normal': HeNormal,
+    'normal': RandomNormal,
   }
 
   def __init__(self, seed) -> None:
       self.g = tf.random.Generator.from_seed(seed)
 
-  def make_initializer(self, initializer_type):
+  def make_initializer(self, initializer_type, **kwargs):
       if initializer_type not in self._INITIALIZERS:
         raise ValueError(f"Initializer type {initializer_type} not found.")
-      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]))
+      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]), **kwargs)
 
 _INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
 
@@ -364,7 +371,7 @@ def resnet(num_blocks, classes=10, training=None):
   x = tf.keras.layers.Dense(
       classes,
       activation='softmax',
-      kernel_initializer=tf.keras.initializers.RandomNormal(
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('normal',
           stddev=0.01, seed=42),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       bias_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
