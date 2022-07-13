@@ -292,7 +292,7 @@ def run(flags_obj):
 
   history = model.fit(train_input_dataset,
                       epochs=train_epochs,
-                      steps_per_epoch=steps_per_epoch,
+                      # steps_per_epoch=steps_per_epoch,
                       callbacks=callbacks,
                       validation_steps=num_eval_steps,
                       validation_data=validation_data,
@@ -308,8 +308,6 @@ def run(flags_obj):
     no_dist_strat_device.__exit__()
 
   stats = common.build_stats(history, eval_output, callbacks)
-  with Path(flags_obj.model_dir, "stats.json").open('w') as f:
-      json.dump(stats, f, default=str)
   return stats
 
 
@@ -323,7 +321,11 @@ def define_cifar_flags():
 
 
 def main(_):
-  return run(flags.FLAGS)
+  stats = run(flags.FLAGS)
+  with Path(flags.FLAGS.model_dir, "stats.json").open('w') as f:
+    json.dump(stats, f, default=str)
+  return stats
+
 
 
 if __name__ == '__main__':
