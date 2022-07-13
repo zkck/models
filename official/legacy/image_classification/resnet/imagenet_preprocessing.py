@@ -115,7 +115,7 @@ def process_record_dataset(dataset,
     # Shuffles records before repeating to respect epoch boundaries.
     dataset = dataset.shuffle(buffer_size=shuffle_buffer, seed=22)
     # Repeats the dataset for the number of epochs to train.
-    dataset = dataset.repeat()
+    # dataset = dataset.repeat()
 
   # Parses the raw records into images and labels.
   dataset = dataset.map(
