@@ -322,7 +322,9 @@ def define_cifar_flags():
 
 def main(_):
   stats = run(flags.FLAGS)
-  with Path(flags.FLAGS.model_dir, "stats.json").open('w') as f:
+  model_dir = Path(flags.FLAGS.model_dir)
+  model_dir.mkdir(parents=True, exist_ok=True)
+  with (model_dir / "stats.json").open('w') as f:
     json.dump(stats, f, default=str)
   return stats
 
