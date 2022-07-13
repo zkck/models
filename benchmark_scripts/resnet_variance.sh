@@ -6,13 +6,13 @@ cd official/benchmark/models
 
 for i in {1..5}
 do
-	python resnet_cifar_main.py \
-		--data_dir /home/zkck/training-data/imagenet2012/tfrecords \
+	python resnet_imagenet_main.py \
+		--data_dir "$DATA_DIR/imagenet2012/tfrecords" \
 		--tpu "local" \
 		-ds tpu \
 		--train_epochs 90 \
 		--enable_tensorboard \
-		--model_dir "/home/zkck/data/run$i" \
+		--model_dir "$MODEL_DIR/run$i" \
 		--seed 1 \
 		--enable_op_determinism
 done
