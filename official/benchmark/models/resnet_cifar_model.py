@@ -372,7 +372,7 @@ def resnet(num_blocks, classes=10, training=None):
       classes,
       activation='softmax',
       kernel_initializer=_INITIALIZER_FACTORY.make_initializer('normal',
-          stddev=0.01, seed=42),
+          stddev=0.01),
       kernel_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       bias_regularizer=tf.keras.regularizers.L2(L2_WEIGHT_DECAY),
       name='fc10')(
