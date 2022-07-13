@@ -14,7 +14,10 @@
 # ==============================================================================
 """Runs a ResNet model on the ImageNet dataset."""
 
+import json
 import os
+from pathlib import Path
+import sys
 
 # Import libraries
 from absl import app
@@ -74,6 +77,8 @@ def run(flags_obj):
   Returns:
     Dictionary of training and eval stats.
   """
+  common.set_determinism_mode(flags_obj)
+
   keras_utils.set_session_config(
       enable_xla=flags_obj.enable_xla)
   # Execute flag override logic for better model performance
@@ -288,7 +293,7 @@ def run(flags_obj):
 
   history = model.fit(train_input_dataset,
                       epochs=train_epochs,
-                      steps_per_epoch=steps_per_epoch,
+                      # steps_per_epoch=steps_per_epoch,
                       callbacks=callbacks,
                       validation_steps=num_eval_steps,
                       validation_data=validation_data,
@@ -334,12 +339,16 @@ def define_imagenet_keras_flags():
 
 
 def main(_):
-  model_helpers.apply_clean(flags.FLAGS)
   stats = run(flags.FLAGS)
-  logging.info('Run stats:\n%s', stats)
+  model_dir = Path(flags.FLAGS.model_dir)
+  model_dir.mkdir(parents=True, exist_ok=True)
+  with (model_dir / "stats.json").open('w') as f:
+    json.dump(stats, f, default=str)
+  json.dump(stats, sys.stdout, indent=2, default=str)
 
 
 if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   define_imagenet_keras_flags()
+  common.define_determinism_flags()
   app.run(main)
