@@ -15,7 +15,9 @@
 # Lint as: python3
 """Runs an Image Classification model."""
 
+import json
 import os
+from pathlib import Path
 import pprint
 from typing import Any, Mapping, Optional, Text, Tuple
 
@@ -430,6 +432,7 @@ def run(flags_obj: flags.FlagValues,
   Returns:
     Dictionary of training/eval stats
   """
+  common.set_determinism_mode(flags_obj)
   params = _get_params_from_flags(flags_obj)
   if params.mode == 'train_and_eval':
     return train_and_eval(params, strategy_override)
@@ -441,13 +444,17 @@ def run(flags_obj: flags.FlagValues,
 
 def main(_):
   stats = run(flags.FLAGS)
-  if stats:
-    logging.info('Run stats:\n%s', stats)
+  model_dir = Path(flags.FLAGS.model_dir)
+  model_dir.mkdir(parents=True, exist_ok=True)
+  with (model_dir / "stats.json").open('w') as f:
+    json.dump(stats, f, default=str)
+  return stats
 
 
 if __name__ == '__main__':
   logging.set_verbosity(logging.INFO)
   define_classifier_flags()
+  common.define_determinism_flags()
   flags.mark_flag_as_required('data_dir')
   flags.mark_flag_as_required('mode')
   flags.mark_flag_as_required('model_type')
