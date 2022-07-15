@@ -104,7 +104,6 @@ def process_record_dataset(dataset,
     dataset = dataset.with_options(options)
     logging.info('datasets_num_private_threads: %s',
                  datasets_num_private_threads)
-  dataset = dataset.with_options(options)
 
   kwargs = {}
   if _PARALLEL_RANDOMNESS:
@@ -132,9 +131,9 @@ def process_record_dataset(dataset,
   # on how many devices are present.
   dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-  options = tf.data.Options()
-  options.experimental_slack = tf_data_experimental_slack
-  dataset = dataset.with_options(options)
+  # options = tf.data.Options()
+  # options.experimental_slack = tf_data_experimental_slack
+  # dataset = dataset.with_options(options)
 
   return dataset
 
