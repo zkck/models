@@ -18,6 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
+
 import numpy as np
 import tensorflow as tf
 
@@ -90,7 +93,10 @@ def jitter_boxes(boxes, noise_scale=0.025):
         boxes.shape[-1]))
 
   with tf.name_scope('jitter_boxes'):
-    bbox_jitters = tf.random.normal(boxes.get_shape(), stddev=noise_scale)
+    if _PARALLEL_RANDOMNESS:
+      bbox_jitters = tf.random.deterministic_normal(boxes.get_shape(), stddev=noise_scale)
+    else:
+      bbox_jitters = tf.random.normal(boxes.get_shape(), stddev=noise_scale)
     ymin = boxes[..., 0:1]
     xmin = boxes[..., 1:2]
     ymax = boxes[..., 2:3]

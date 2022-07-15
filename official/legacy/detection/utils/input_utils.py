@@ -18,6 +18,9 @@ import math
 
 import tensorflow as tf
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
+
 from official.legacy.detection.utils import box_utils
 from official.vision.utils.object_detection import preprocessor
 
@@ -151,10 +154,16 @@ def resize_and_crop_image(image,
     random_jittering = (aug_scale_min != 1.0 or aug_scale_max != 1.0)
 
     if random_jittering:
-      random_scale = tf.random.uniform([],
-                                       aug_scale_min,
-                                       aug_scale_max,
-                                       seed=seed)
+      if _PARALLEL_RANDOMNESS:
+        random_scale = tf.random.deterministic_uniform([],
+                                        aug_scale_min,
+                                        aug_scale_max,
+                                        seed=seed)
+      else:
+        random_scale = tf.random.uniform([],
+                                        aug_scale_min,
+                                        aug_scale_max,
+                                        seed=seed)
       scaled_size = tf.round(random_scale * desired_size)
     else:
       scaled_size = desired_size
@@ -172,9 +181,14 @@ def resize_and_crop_image(image,
       max_offset = scaled_size - desired_size
       max_offset = tf.where(
           tf.less(max_offset, 0), tf.zeros_like(max_offset), max_offset)
-      offset = max_offset * tf.random.uniform([
-          2,
-      ], 0, 1, seed=seed)
+      if _PARALLEL_RANDOMNESS:
+        offset = max_offset * tf.random.deterministic_uniform([
+            2,
+        ], 0, 1, seed=seed)
+      else:
+        offset = max_offset * tf.random.uniform([
+            2,
+        ], 0, 1, seed=seed)
       offset = tf.cast(offset, tf.int32)
     else:
       offset = tf.zeros((2,), tf.int32)
@@ -262,10 +276,16 @@ def resize_and_crop_image_v2(image,
     random_jittering = (aug_scale_min != 1.0 or aug_scale_max != 1.0)
 
     if random_jittering:
-      random_scale = tf.random.uniform([],
-                                       aug_scale_min,
-                                       aug_scale_max,
-                                       seed=seed)
+      if _PARALLEL_RANDOMNESS:
+        random_scale = tf.random.deterministic_uniform([],
+                                        aug_scale_min,
+                                        aug_scale_max,
+                                        seed=seed)
+      else:
+        random_scale = tf.random.uniform([],
+                                        aug_scale_min,
+                                        aug_scale_max,
+                                        seed=seed)
       scaled_size = tf.math.round(random_scale * scaled_size)
 
     # Computes 2D image_scale.
@@ -277,9 +297,14 @@ def resize_and_crop_image_v2(image,
       max_offset = scaled_size - desired_size
       max_offset = tf.where(
           tf.math.less(max_offset, 0), tf.zeros_like(max_offset), max_offset)
-      offset = max_offset * tf.random.uniform([
-          2,
-      ], 0, 1, seed=seed)
+      if _PARALLEL_RANDOMNESS:
+        offset = max_offset * tf.random.deterministic_uniform([
+            2,
+        ], 0, 1, seed=seed)
+      else:
+        offset = max_offset * tf.random.uniform([
+            2,
+        ], 0, 1, seed=seed)
       offset = tf.cast(offset, tf.int32)
     else:
       offset = tf.zeros((2,), tf.int32)

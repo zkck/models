@@ -43,6 +43,8 @@ import numpy as np
 import tensorflow as tf
 from official.vision.utils.object_detection import box_list
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 def _flip_boxes_left_right(boxes):
   """Left-right flip the boxes.
@@ -231,7 +233,10 @@ def random_horizontal_flip(image,
   with tf.name_scope('RandomHorizontalFlip'):
     result = []
     # random variable defining whether to do flip or not
-    do_a_flip_random = tf.greater(tf.random.uniform([], seed=seed), 0.5)
+    if _PARALLEL_RANDOMNESS:
+      do_a_flip_random = tf.greater(tf.random.deterministic_uniform([], seed=seed), 0.5)
+    else:
+      do_a_flip_random = tf.greater(tf.random.uniform([], seed=seed), 0.5)
 
     # flip image
     image = tf.cond(
