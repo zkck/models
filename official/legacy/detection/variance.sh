@@ -29,5 +29,5 @@ do
     --tpu="${TPU_NAME?}" \
     --model_dir="${MODEL_DIR?}/run$i" \
     --mode=train \
-    --params_override="${PARAMS?}" \
+    --params_override="${PARAMS?}"
 done
