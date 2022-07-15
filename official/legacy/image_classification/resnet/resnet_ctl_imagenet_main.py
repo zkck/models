@@ -97,6 +97,9 @@ def run(flags_obj):
   Returns:
     Dictionary of training and eval stats.
   """
+  tf.keras.utils.set_random_seed(1)
+  tf.config.experimental.enable_op_determinism()
+
   keras_utils.set_session_config()
   performance.set_mixed_precision_policy(flags_core.get_tf_dtype(flags_obj))
 

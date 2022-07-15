@@ -430,6 +430,9 @@ def run(flags_obj: flags.FlagValues,
   Returns:
     Dictionary of training/eval stats
   """
+  tf.keras.utils.set_random_seed(1)
+  tf.config.experimental.enable_op_determinism()
+
   params = _get_params_from_flags(flags_obj)
   if params.mode == 'train_and_eval':
     return train_and_eval(params, strategy_override)
