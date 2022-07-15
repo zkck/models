@@ -175,6 +175,9 @@ def run_executor(params,
 def run(callbacks=None):
   """Runs the experiment."""
   keras_utils.set_session_config(enable_xla=FLAGS.enable_xla)
+  tf.keras.utils.set_random_seed(1)
+  tf.config.experimental.enable_op_determinism()
+
 
   params = config_factory.config_generator(FLAGS.model)
 
