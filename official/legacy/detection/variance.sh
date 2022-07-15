@@ -26,7 +26,7 @@ for i in {1..5}
 do
   python3 main.py \
     --strategy_type=tpu \
-    --tpu="${TPU_NAME?}" \
+    --tpu="local" \
     --model_dir="${MODEL_DIR?}/run$i" \
     --mode=train \
     --params_override="${PARAMS?}"
