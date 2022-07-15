@@ -1,0 +1,15 @@
+python3 resnet_ctl_imagenet_main.py \
+  --tpu="local" \
+  --model_dir="${MODEL_DIR?}" \
+  --data_dir="$HOME/training-data/imagenet2012/tfrecords" \
+  --batch_size=1024 \
+  --steps_per_loop=500 \
+  --train_epochs="${TRAIN_EPOCHS?}" \
+  --use_synthetic_data=false \
+  --dtype=fp32 \
+  --enable_eager=true \
+  --enable_tensorboard=true \
+  --distribution_strategy=tpu \
+  --log_steps=50 \
+  --single_l2_loss_op=true \
+  --use_tf_function=true
