@@ -1,5 +1,8 @@
 #!/bin/bash
+suffix="${1?}"
+
 DATA_DIR="$HOME/training-data"
+MODEL_DIR="$HOME/data-retinanet-$suffix"
 
 TRAIN_FILE_PATTERN="${DATA_DIR?}/coco/train-*-of-*.tfrecord"
 EVAL_FILE_PATTERN="${DATA_DIR?}/coco/val-*-of-*.tfrecord"
@@ -18,8 +21,6 @@ eval:
   val_json_file: ${VAL_JSON_FILE?}
   eval_file_pattern: ${EVAL_FILE_PATTERN?}
 "
-
-cd ~/models/official/legacy/detection
 
 for i in {1..5}
 do
