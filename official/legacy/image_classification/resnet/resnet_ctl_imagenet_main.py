@@ -14,8 +14,10 @@
 
 """Runs a ResNet model on the ImageNet dataset using custom training loops."""
 
+import json
 import math
 import os
+from pathlib import Path
 
 # Import libraries
 from absl import app
@@ -189,6 +191,10 @@ def run(flags_obj):
 def main(_):
   model_helpers.apply_clean(flags.FLAGS)
   stats = run(flags.FLAGS)
+  model_dir = Path(flags.FLAGS.model_dir)
+  model_dir.mkdir(exist_ok=True, parents=True)
+  with (model_dir / "stats.json").open('w') as f:
+    json.dump(stats, f, default=str, indent=2)
   logging.info('Run stats:\n%s', stats)
 
 

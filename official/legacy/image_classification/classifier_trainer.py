@@ -15,7 +15,9 @@
 # Lint as: python3
 """Runs an Image Classification model."""
 
+import json
 import os
+from pathlib import Path
 import pprint
 from typing import Any, Mapping, Optional, Text, Tuple
 
@@ -444,8 +446,11 @@ def run(flags_obj: flags.FlagValues,
 
 def main(_):
   stats = run(flags.FLAGS)
-  if stats:
-    logging.info('Run stats:\n%s', stats)
+  model_dir = Path(flags.FLAGS.model_dir)
+  model_dir.mkdir(exist_ok=True, parents=True)
+  with (model_dir / "stats.json").open('w') as f:
+    json.dump(stats, f, default=str, indent=2)
+  logging.info('Run stats:\n%s', stats)
 
 
 if __name__ == '__main__':
