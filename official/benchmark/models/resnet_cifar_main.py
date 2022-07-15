@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 import hashlib
 import itertools
+import sys
 
 # Import libraries
 from absl import app
@@ -326,8 +327,7 @@ def main(_):
   model_dir.mkdir(parents=True, exist_ok=True)
   with (model_dir / "stats.json").open('w') as f:
     json.dump(stats, f, default=str)
-  return stats
-
+  json.dump(stats, sys.stdout, indent=2, default=str)
 
 
 if __name__ == '__main__':
