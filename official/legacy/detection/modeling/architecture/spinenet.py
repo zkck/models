@@ -29,6 +29,54 @@ from official.modeling import tf_utils
 
 layers = tf.keras.layers
 
+
+class RandomNormal(tf.keras.initializers.RandomNormal):
+
+    def __init__(self, mean=0.0, stddev=0.05, seed=None):
+      super().__init__(mean=mean, stddev=stddev, seed=seed)
+      self._random_generator._force_generator = True
+
+
+class HeNormal(tf.keras.initializers.VarianceScaling):
+
+  def __init__(self, seed=None):
+    super(HeNormal, self).__init__(
+        scale=2., mode='fan_in', distribution='truncated_normal', seed=seed)
+    self._random_generator._force_generator = True
+
+  def get_config(self):
+    return {'seed': self.seed}
+
+
+class VarianceScaling(tf.keras.initializers.VarianceScaling):
+  def __init__(self,
+               scale=1.0,
+               mode='fan_in',
+               distribution='truncated_normal',
+               seed=None):
+      super().__init__(scale=scale, mode=mode, distribution=distribution, seed=seed)
+      self._random_generator._force_generator = True
+
+
+class DeterministicInitializerFactory:
+
+  _INITIALIZERS = {
+    'he_normal': HeNormal,
+    'normal': RandomNormal,
+    'VarianceScaling': VarianceScaling,
+  }
+
+  def __init__(self, seed) -> None:
+      self.g = tf.random.Generator.from_seed(seed)
+
+  def make_initializer(self, initializer_type, **kwargs):
+      if initializer_type not in self._INITIALIZERS:
+        raise ValueError(f"Initializer type {initializer_type} not found.")
+      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]), **kwargs)
+
+_INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
+
+
 FILTER_SIZE_MAP = {
     1: 32,
     2: 64,
@@ -115,6 +163,10 @@ def build_block_specs(block_specs=None):
 class SpineNet(tf.keras.Model):
   """Class to build SpineNet models."""
 
+  @property
+  def _kernel_initializer(self):
+    return _INITIALIZER_FACTORY.make_initializer(self.__kernel_initializer)
+
   def __init__(self,
                input_specs=tf.keras.layers.InputSpec(shape=[None, 640, 640, 3]),
                min_level=3,
@@ -140,7 +192,7 @@ class SpineNet(tf.keras.Model):
     self._resample_alpha = resample_alpha
     self._block_repeats = block_repeats
     self._filter_size_scale = filter_size_scale
-    self._kernel_initializer = kernel_initializer
+    self.__kernel_initializer = kernel_initializer
     self._kernel_regularizer = kernel_regularizer
     self._bias_regularizer = bias_regularizer
     self._use_sync_bn = use_sync_bn
