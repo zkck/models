@@ -159,6 +159,7 @@ def _get_params_from_flags(flags_obj: flags.FlagValues):
       'runtime': {
           'run_eagerly': flags_obj.run_eagerly,
           'tpu': flags_obj.tpu,
+          'distribution_strategy': flags_obj.strategy_type,
       },
       'train_dataset': {
           'data_dir': flags_obj.data_dir,
