@@ -14,7 +14,7 @@ architecture:
   backbone: spinenet
   multilevel_features: identity
 spinenet:
-  model_id: 49
+  model_id: '49'
 train:
   train_file_pattern: ${TRAIN_FILE_PATTERN?}
 eval:
