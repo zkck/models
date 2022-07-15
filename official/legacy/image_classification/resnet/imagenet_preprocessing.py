@@ -406,7 +406,7 @@ def _decode_crop_and_flip(image_buffer, bbox, num_channels):
         area_range=[0.05, 1.0],
         max_attempts=100,
         use_image_if_no_bounding_boxes=True,
-        seed=int(flags.FLAGS.enable_op_determinism))
+        seed=1)
   bbox_begin, bbox_size, _ = sample_distorted_bounding_box
 
   # Reassemble the bounding box in the format the crop op requires.
