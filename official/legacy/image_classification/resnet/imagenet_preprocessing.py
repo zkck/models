@@ -36,8 +36,10 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 from absl import logging
+from absl import flags
 import tensorflow as tf
 
 DEFAULT_IMAGE_SIZE = 224
@@ -102,6 +104,12 @@ def process_record_dataset(dataset,
     dataset = dataset.with_options(options)
     logging.info('datasets_num_private_threads: %s',
                  datasets_num_private_threads)
+  dataset = dataset.with_options(options)
+
+  kwargs = {}
+  if _PARALLEL_RANDOMNESS:
+    dataset = dataset.deterministic()
+    kwargs['deterministic_randomness'] = True
 
   if is_training:
     # Shuffles records before repeating to respect epoch boundaries.
@@ -112,7 +120,8 @@ def process_record_dataset(dataset,
   # Parses the raw records into images and labels.
   dataset = dataset.map(
       lambda value: parse_record_fn(value, is_training, dtype),
-      num_parallel_calls=tf.data.experimental.AUTOTUNE)
+      num_parallel_calls=tf.data.experimental.AUTOTUNE,
+      **kwargs)
   dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
 
   # Operations between the final prefetch and the get_next call to the iterator
@@ -134,12 +143,12 @@ def get_filenames(is_training, data_dir):
   """Return filenames for dataset."""
   if is_training:
     return [
-        os.path.join(data_dir, 'train-%05d-of-01024' % i)
+        os.path.join(data_dir, 'train', 'train-%05d-of-01024' % i)
         for i in range(_NUM_TRAIN_FILES)
     ]
   else:
     return [
-        os.path.join(data_dir, 'validation-%05d-of-00128' % i)
+        os.path.join(data_dir, 'validation', 'validation-%05d-of-00128' % i)
         for i in range(128)
     ]
 
@@ -380,14 +389,25 @@ def _decode_crop_and_flip(image_buffer, bbox, num_channels):
   # allowed range of aspect ratios, sizes and overlap with the human-annotated
   # bounding box. If no box is supplied, then we assume the bounding box is
   # the entire image.
-  sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
-      tf.image.extract_jpeg_shape(image_buffer),
-      bounding_boxes=bbox,
-      min_object_covered=0.1,
-      aspect_ratio_range=[0.75, 1.33],
-      area_range=[0.05, 1.0],
-      max_attempts=100,
-      use_image_if_no_bounding_boxes=True)
+  if _PARALLEL_RANDOMNESS:
+    sample_distorted_bounding_box = tf.image.deterministic_sample_distorted_bounding_box(
+        tf.image.extract_jpeg_shape(image_buffer),
+        bounding_boxes=bbox,
+        min_object_covered=0.1,
+        aspect_ratio_range=[0.75, 1.33],
+        area_range=[0.05, 1.0],
+        max_attempts=100,
+        use_image_if_no_bounding_boxes=True)
+  else:
+    sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
+        tf.image.extract_jpeg_shape(image_buffer),
+        bounding_boxes=bbox,
+        min_object_covered=0.1,
+        aspect_ratio_range=[0.75, 1.33],
+        area_range=[0.05, 1.0],
+        max_attempts=100,
+        use_image_if_no_bounding_boxes=True,
+        seed=int(flags.FLAGS.enable_op_determinism))
   bbox_begin, bbox_size, _ = sample_distorted_bounding_box
 
   # Reassemble the bounding box in the format the crop op requires.
@@ -400,7 +420,10 @@ def _decode_crop_and_flip(image_buffer, bbox, num_channels):
       image_buffer, crop_window, channels=num_channels)
 
   # Flip to add a little more random distortion in.
-  cropped = tf.image.random_flip_left_right(cropped)
+  if _PARALLEL_RANDOMNESS:
+    cropped = tf.image.deterministic_random_flip_left_right(cropped)
+  else:
+    cropped = tf.image.random_flip_left_right(cropped)
   return cropped
 
 
