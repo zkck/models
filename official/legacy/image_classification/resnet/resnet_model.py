@@ -32,6 +32,63 @@ from official.legacy.image_classification.resnet import imagenet_preprocessing
 
 layers = tf.keras.layers
 
+class RandomNormal(tf.keras.initializers.RandomNormal):
+
+    def __init__(self, mean=0.0, stddev=0.05, seed=None):
+      super().__init__(mean=mean, stddev=stddev, seed=seed)
+      self._random_generator._force_generator = True
+
+
+class HeNormal(tf.keras.initializers.VarianceScaling):
+  """He normal initializer.
+   Also available via the shortcut function
+  `tf.keras.initializers.he_normal`.
+  It draws samples from a truncated normal distribution centered on 0 with
+  `stddev = sqrt(2 / fan_in)` where `fan_in` is the number of input units in the
+  weight tensor.
+  Examples:
+  >>> # Standalone usage:
+  >>> initializer = tf.keras.initializers.HeNormal()
+  >>> values = initializer(shape=(2, 2))
+  >>> # Usage in a Keras layer:
+  >>> initializer = tf.keras.initializers.HeNormal()
+  >>> layer = tf.keras.layers.Dense(3, kernel_initializer=initializer)
+  Args:
+    seed: A Python integer. Used to make the behavior of the initializer
+      deterministic. Note that a seeded
+      initializer will not produce the same random values across multiple calls,
+      but multiple initializers will produce the same sequence when constructed
+      with the same seed value.
+  References:
+    - [He et al., 2015](https://arxiv.org/abs/1502.01852)
+  """
+
+  def __init__(self, seed=None):
+    super(HeNormal, self).__init__(
+        scale=2., mode='fan_in', distribution='truncated_normal', seed=seed)
+    self._random_generator._force_generator = True
+
+  def get_config(self):
+    return {'seed': self.seed}
+
+
+class DeterministicInitializerFactory:
+
+  _INITIALIZERS = {
+    'he_normal': HeNormal,
+    'normal': RandomNormal,
+  }
+
+  def __init__(self, seed) -> None:
+      self.g = tf.random.Generator.from_seed(seed)
+
+  def make_initializer(self, initializer_type, **kwargs):
+      if initializer_type not in self._INITIALIZERS:
+        raise ValueError(f"Initializer type {initializer_type} not found.")
+      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]), **kwargs)
+
+_INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
+
 
 def _gen_l2_regularizer(use_l2_regularizer=True, l2_weight_decay=1e-4):
   return tf.keras.regularizers.L2(
@@ -72,7 +129,7 @@ def identity_block(input_tensor,
   x = layers.Conv2D(
       filters1, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -89,7 +146,7 @@ def identity_block(input_tensor,
       kernel_size,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2b')(
           x)
@@ -104,7 +161,7 @@ def identity_block(input_tensor,
   x = layers.Conv2D(
       filters3, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2c')(
           x)
@@ -160,7 +217,7 @@ def conv_block(input_tensor,
   x = layers.Conv2D(
       filters1, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2a')(
           input_tensor)
@@ -178,7 +235,7 @@ def conv_block(input_tensor,
       strides=strides,
       padding='same',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2b')(
           x)
@@ -193,7 +250,7 @@ def conv_block(input_tensor,
   x = layers.Conv2D(
       filters3, (1, 1),
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '2c')(
           x)
@@ -208,7 +265,7 @@ def conv_block(input_tensor,
       filters3, (1, 1),
       strides=strides,
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name=conv_name_base + '1')(
           input_tensor)
@@ -274,7 +331,7 @@ def resnet50(num_classes,
       strides=(2, 2),
       padding='valid',
       use_bias=False,
-      kernel_initializer='he_normal',
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('he_normal'),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name='conv1')(
           x)
@@ -311,7 +368,8 @@ def resnet50(num_classes,
   x = layers.GlobalAveragePooling2D()(x)
   x = layers.Dense(
       num_classes,
-      kernel_initializer=tf.initializers.random_normal(stddev=0.01),
+      kernel_initializer=_INITIALIZER_FACTORY.make_initializer('normal',
+          stddev=0.01),
       kernel_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       bias_regularizer=_gen_l2_regularizer(use_l2_regularizer),
       name='fc1000')(
