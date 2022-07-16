@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 import dataclasses
 import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 from typing import Any, List, Mapping, Optional, Tuple, Union
 
 from absl import logging
@@ -436,8 +437,14 @@ class DatasetBuilder:
       preprocess = self.parse_record
     else:
       preprocess = self.preprocess
+
+    kwargs = {}
+    if _PARALLEL_RANDOMNESS:
+      dataset = dataset.deterministic()
+      kwargs['deterministic_randomness'] = True
+
     dataset = dataset.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE, **kwargs)
 
     if self.input_context and self.config.num_devices > 1:
       if not self.config.use_per_replica_batch_size:
