@@ -23,6 +23,8 @@ from official.legacy.detection.dataloader import factory
 from official.legacy.detection.dataloader import mode_keys as ModeKeys
 from official.modeling.hyperparams import params_dict
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
 
 class InputFn(object):
   """Input function that creates dataset from files."""
@@ -98,8 +100,13 @@ class InputFn(object):
       dataset = dataset.take(self._num_examples)
 
     # Parses the fetched records to input tensors for model function.
+    kwargs = {}
+    if _PARALLEL_RANDOMNESS:
+      dataset = dataset.deterministic()
+      kwargs['deterministic_randomness'] = True
     dataset = dataset.map(
-        self._parser_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        self._parser_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE,
+        **kwargs)
     dataset = dataset.batch(batch_size, drop_remainder=True)
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
     return dataset
