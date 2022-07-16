@@ -28,6 +28,7 @@ import math
 from typing import Any, Dict, Optional, Text, Tuple
 
 from absl import logging
+from official.common import determinism
 import tensorflow as tf
 from official.legacy.image_classification import preprocessing
 from official.legacy.image_classification.efficientnet import common_modules
@@ -105,24 +106,30 @@ MODEL_CONFIGS = {
     'efficientnet-l2': ModelConfig.from_args(4.3, 5.3, 800, 0.5),
 }
 
-CONV_KERNEL_INITIALIZER = {
-    'class_name': 'VarianceScaling',
-    'config': {
-        'scale': 2.0,
-        'mode': 'fan_out',
-        # Note: this is a truncated normal distribution
-        'distribution': 'normal'
-    }
-}
+_INITIALIZER_FACTORY = determinism.DeterministicInitializerFactory(66)
 
-DENSE_KERNEL_INITIALIZER = {
-    'class_name': 'VarianceScaling',
-    'config': {
-        'scale': 1 / 3.0,
-        'mode': 'fan_out',
-        'distribution': 'uniform'
-    }
-}
+# CONV_KERNEL_INITIALIZER = {
+#     'class_name': 'VarianceScaling',
+#     'config': {
+#         'scale': 2.0,
+#         'mode': 'fan_out',
+#         # Note: this is a truncated normal distribution
+#         'distribution': 'normal'
+#     }
+# }
+def conv_kernel_initializer():
+  return _INITIALIZER_FACTORY.make_initializer('variance_scaling', scale=2.0, mode='fan_out', distribution='normal')
+
+# DENSE_KERNEL_INITIALIZER = {
+#     'class_name': 'VarianceScaling',
+#     'config': {
+#         'scale': 1 / 3.0,
+#         'mode': 'fan_out',
+#         'distribution': 'uniform'
+#     }
+# }
+def dense_kernel_initializer():
+  return _INITIALIZER_FACTORY.make_initializer('variance_scaling', scale=1 / 3.0, mode='fan_out', distribution='uniform')
 
 
 def round_filters(filters: int, config: ModelConfig) -> int:
@@ -182,12 +189,12 @@ def conv2d_block(inputs: tf.Tensor,
 
   if depthwise:
     conv2d = tf.keras.layers.DepthwiseConv2D
-    init_kwargs.update({'depthwise_initializer': CONV_KERNEL_INITIALIZER})
+    init_kwargs.update({'depthwise_initializer': conv_kernel_initializer()})
   else:
     conv2d = tf.keras.layers.Conv2D
     init_kwargs.update({
         'filters': conv_filters,
-        'kernel_initializer': CONV_KERNEL_INITIALIZER
+        'kernel_initializer': conv_kernel_initializer()
     })
 
   x = conv2d(**init_kwargs)(inputs)
@@ -411,7 +418,7 @@ def efficientnet(image_input: tf.keras.layers.Input, config: ModelConfig):  # py
     x = tf.keras.layers.Dropout(dropout_rate, name='top_dropout')(x)
   x = tf.keras.layers.Dense(
       num_classes,
-      kernel_initializer=DENSE_KERNEL_INITIALIZER,
+      kernel_initializer=dense_kernel_initializer(),
       kernel_regularizer=tf.keras.regularizers.l2(weight_decay),
       bias_regularizer=tf.keras.regularizers.l2(weight_decay),
       name='logits')(
