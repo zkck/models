@@ -49,7 +49,7 @@ class EfficientNetImageNetConfig(base_configs.ExperimentConfig):
       epochs=500,
       steps=None,
       callbacks=base_configs.CallbacksConfig(
-          enable_checkpoint_and_export=True, enable_tensorboard=True),
+          enable_checkpoint_and_export=False, enable_tensorboard=True),
       metrics=['accuracy', 'top_5'],
       time_history=base_configs.TimeHistoryConfig(log_steps=100),
       tensorboard=base_configs.TensorBoardConfig(
