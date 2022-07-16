@@ -368,7 +368,7 @@ class DatasetBuilder:
       if self.config.data_dir is None:
         raise ValueError('Dataset must specify a path for the data files.')
 
-      file_pattern = os.path.join(self.config.data_dir,
+      file_pattern = os.path.join(self.config.data_dir, self.config.split,
                                   '{}*'.format(self.config.split))
       dataset = tf.data.Dataset.list_files(file_pattern, shuffle=False)
     else:
