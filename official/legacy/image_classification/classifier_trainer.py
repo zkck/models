@@ -25,6 +25,7 @@ from typing import Any, Mapping, Optional, Text, Tuple
 
 import os
 _CHECK_HASHES = os.environ.get("ZCK_CHECK_HASHES")
+_CHECK_WEIGHTS = os.environ.get("ZCK_CHECK_WEIGHTS")
 
 from absl import app
 from absl import flags
@@ -400,6 +401,9 @@ def train_and_eval(
         model_dir=params.model_dir,
         backup_and_restore=params.train.callbacks.enable_backup_and_restore)
 
+  if _CHECK_WEIGHTS:
+    model.save_weights(os.path.join(params.model_dir, "my_model_weights.h5"))
+    return {}
   serialize_config(params=params, model_dir=params.model_dir)
 
   if params.evaluation.skip_eval:
