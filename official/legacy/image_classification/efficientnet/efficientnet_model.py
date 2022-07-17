@@ -323,7 +323,7 @@ def mb_conv_block(inputs: tf.Tensor,
       # drop_connect_rate during training. See:
       # https://github.com/keras-team/keras/pull/9898#issuecomment-380577612
       x = _INITIALIZER_FACTORY.make_dropout(
-          drop_connect_rate, noise_shape=(None, 1, 1, 1), name=prefix + 'drop', seed=7)(
+          drop_connect_rate, noise_shape=(None, 1, 1, 1), name=prefix + 'drop')(
               x)
 
     x = tf.keras.layers.add([x, inputs], name=prefix + 'add')
@@ -415,7 +415,7 @@ def efficientnet(image_input: tf.keras.layers.Input, config: ModelConfig):  # py
   # Build classifier
   x = tf.keras.layers.GlobalAveragePooling2D(name='top_pool')(x)
   if dropout_rate and dropout_rate > 0:
-    x = _INITIALIZER_FACTORY.make_dropout(dropout_rate, name='top_dropout', seed=8)(x)
+    x = _INITIALIZER_FACTORY.make_dropout(dropout_rate, name='top_dropout')(x)
   x = tf.keras.layers.Dense(
       num_classes,
       kernel_initializer=dense_kernel_initializer(),
