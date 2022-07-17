@@ -15,6 +15,8 @@
 """Main function to train various object detection models."""
 
 import functools
+import json
+from pathlib import Path
 import pprint
 
 from absl import app
@@ -248,13 +250,21 @@ def run(callbacks=None):
             log_steps=FLAGS.log_steps,
         ))
 
-  return run_executor(
+  stats = run_executor(
       params,
       FLAGS.mode,
       checkpoint_path=FLAGS.checkpoint_path,
       train_input_fn=train_input_fn,
       eval_input_fn=eval_input_fn,
       callbacks=callbacks)
+
+  model_dir = Path(FLAGS.model_dir)
+  model_dir.mkdir(exist_ok=True, parents=True)
+  with (model_dir / f"stats_{FLAGS.mode}.json").open('w') as f:
+    json.dump(stats, f, default=str, indent=2)
+  logging.info('Run stats:\n%s', stats)
+  return stats
+
 
 
 def main(argv):
