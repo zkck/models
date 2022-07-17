@@ -157,8 +157,7 @@ def resize_and_crop_image(image,
       if _PARALLEL_RANDOMNESS:
         random_scale = tf.random.deterministic_uniform([],
                                         aug_scale_min,
-                                        aug_scale_max,
-                                        seed=seed)
+                                        aug_scale_max)
       else:
         random_scale = tf.random.uniform([],
                                         aug_scale_min,
@@ -184,7 +183,7 @@ def resize_and_crop_image(image,
       if _PARALLEL_RANDOMNESS:
         offset = max_offset * tf.random.deterministic_uniform([
             2,
-        ], 0, 1, seed=seed)
+        ], 0, 1)
       else:
         offset = max_offset * tf.random.uniform([
             2,
@@ -279,8 +278,7 @@ def resize_and_crop_image_v2(image,
       if _PARALLEL_RANDOMNESS:
         random_scale = tf.random.deterministic_uniform([],
                                         aug_scale_min,
-                                        aug_scale_max,
-                                        seed=seed)
+                                        aug_scale_max)
       else:
         random_scale = tf.random.uniform([],
                                         aug_scale_min,
@@ -300,7 +298,7 @@ def resize_and_crop_image_v2(image,
       if _PARALLEL_RANDOMNESS:
         offset = max_offset * tf.random.deterministic_uniform([
             2,
-        ], 0, 1, seed=seed)
+        ], 0, 1)
       else:
         offset = max_offset * tf.random.uniform([
             2,
