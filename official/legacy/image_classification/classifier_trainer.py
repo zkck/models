@@ -295,7 +295,7 @@ def hash_dataset(dataset):
   for image, _label in dataset:
     arr = image.numpy()
     arr.flags.writeable = False
-    m.update(hash(arr.data.tobytes()))
+    m.update(arr.tobytes())
   return m.hexdigest()
 
 def train_and_eval(
@@ -342,7 +342,7 @@ def train_and_eval(
     hash_list = []
     for epoch in range(train_epochs):
       print(f"Epoch {epoch + 1}/{train_epochs}")
-      dataset_hash = hash_dataset(tqdm(itertools.islice(train_dataset, train_steps)))
+      dataset_hash = hash_dataset(tqdm(itertools.islice(train_dataset, train_steps), total=train_steps))
       hash_list.append(dataset_hash)
     return {"hashes": hash_list}
 
