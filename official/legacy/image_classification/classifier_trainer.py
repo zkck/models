@@ -15,11 +15,16 @@
 # Lint as: python3
 """Runs an Image Classification model."""
 
+import hashlib
+import itertools
 import json
 import os
 from pathlib import Path
 import pprint
 from typing import Any, Mapping, Optional, Text, Tuple
+
+import os
+_CHECK_HASHES = os.environ.get("ZCK_CHECK_HASHES")
 
 from absl import app
 from absl import flags
@@ -284,6 +289,13 @@ def serialize_config(params: base_configs.ExperimentConfig, model_dir: str):
   tf.io.gfile.makedirs(model_dir)
   hyperparams.save_params_dict_to_yaml(params, params_save_path)
 
+def hash_dataset(dataset):
+  m = hashlib.md5()
+  for image, _label in dataset:
+    arr = image.numpy()
+    arr.flags.writeable = False
+    m.update(hash(arr.data.tobytes()))
+  return m.hexdigest()
 
 def train_and_eval(
     params: base_configs.ExperimentConfig,
@@ -321,6 +333,18 @@ def train_and_eval(
   train_epochs = params.train.epochs
   train_steps = params.train.steps or train_builder.num_steps
   validation_steps = params.evaluation.steps or validation_builder.num_steps
+
+
+  if _CHECK_HASHES:
+    print("Checking hashes")
+    from tqdm import tqdm
+    hash_list = []
+    for epoch in range(train_epochs):
+      print(f"Epoch {epoch + 1}/{train_epochs}")
+      dataset_hash = hash_dataset(tqdm(itertools.islice(train_dataset, train_steps)))
+      hash_list.append(dataset_hash)
+    return {"hashes": hash_list}
+
 
   initialize(params, train_builder)
 
