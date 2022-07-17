@@ -234,7 +234,7 @@ def random_horizontal_flip(image,
     result = []
     # random variable defining whether to do flip or not
     if _PARALLEL_RANDOMNESS:
-      do_a_flip_random = tf.greater(tf.random.deterministic_uniform([], seed=seed), 0.5)
+      do_a_flip_random = tf.greater(tf.random.deterministic_uniform([]), 0.5)
     else:
       do_a_flip_random = tf.greater(tf.random.uniform([], seed=seed), 0.5)
 
