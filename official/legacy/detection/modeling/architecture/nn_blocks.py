@@ -17,14 +17,20 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from official.common import determinism
 
 import tensorflow as tf
 
 from official.modeling import tf_utils
 
+_INITIALIZER_FACTORY = determinism.DeterministicInitializerFactory(45245)
 
 class ResidualBlock(tf.keras.layers.Layer):
   """A residual block."""
+
+  @property
+  def _kernel_initializer(self):
+    return _INITIALIZER_FACTORY.make_initializer(self.__kernel_initializer)
 
   def __init__(self,
                filters,
@@ -68,7 +74,7 @@ class ResidualBlock(tf.keras.layers.Layer):
     self._use_projection = use_projection
     self._use_sync_bn = use_sync_bn
     self._activation = activation
-    self._kernel_initializer = kernel_initializer
+    self.__kernel_initializer = kernel_initializer
     self._norm_momentum = norm_momentum
     self._norm_epsilon = norm_epsilon
     self._kernel_regularizer = kernel_regularizer
@@ -165,6 +171,11 @@ class ResidualBlock(tf.keras.layers.Layer):
 class BottleneckBlock(tf.keras.layers.Layer):
   """A standard bottleneck block."""
 
+
+  @property
+  def _kernel_initializer(self):
+    return _INITIALIZER_FACTORY.make_initializer(self.__kernel_initializer)
+
   def __init__(self,
                filters,
                strides,
@@ -207,7 +218,7 @@ class BottleneckBlock(tf.keras.layers.Layer):
     self._use_projection = use_projection
     self._use_sync_bn = use_sync_bn
     self._activation = activation
-    self._kernel_initializer = kernel_initializer
+    self.__kernel_initializer = kernel_initializer
     self._norm_momentum = norm_momentum
     self._norm_epsilon = norm_epsilon
     self._kernel_regularizer = kernel_regularizer

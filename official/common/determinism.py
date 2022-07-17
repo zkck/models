@@ -60,5 +60,3 @@ class DeterministicInitializerFactory:
 
   def make_dropout(self, rate, noise_shape=None, **kwargs):
       return Dropout(rate, noise_shape=noise_shape, seed=self.g.uniform_full_int([]), **kwargs)
-
-_INITIALIZER_FACTORY = DeterministicInitializerFactory(66)

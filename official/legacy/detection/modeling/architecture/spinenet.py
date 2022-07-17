@@ -23,6 +23,7 @@ https://arxiv.org/abs/1912.05027
 import math
 
 from absl import logging
+from official.common import determinism
 import tensorflow as tf
 from official.legacy.detection.modeling.architecture import nn_blocks
 from official.modeling import tf_utils
@@ -30,51 +31,7 @@ from official.modeling import tf_utils
 layers = tf.keras.layers
 
 
-class RandomNormal(tf.keras.initializers.RandomNormal):
-
-    def __init__(self, mean=0.0, stddev=0.05, seed=None):
-      super().__init__(mean=mean, stddev=stddev, seed=seed)
-      self._random_generator._force_generator = True
-
-
-class HeNormal(tf.keras.initializers.VarianceScaling):
-
-  def __init__(self, seed=None):
-    super(HeNormal, self).__init__(
-        scale=2., mode='fan_in', distribution='truncated_normal', seed=seed)
-    self._random_generator._force_generator = True
-
-  def get_config(self):
-    return {'seed': self.seed}
-
-
-class VarianceScaling(tf.keras.initializers.VarianceScaling):
-  def __init__(self,
-               scale=1.0,
-               mode='fan_in',
-               distribution='truncated_normal',
-               seed=None):
-      super().__init__(scale=scale, mode=mode, distribution=distribution, seed=seed)
-      self._random_generator._force_generator = True
-
-
-class DeterministicInitializerFactory:
-
-  _INITIALIZERS = {
-    'he_normal': HeNormal,
-    'normal': RandomNormal,
-    'VarianceScaling': VarianceScaling,
-  }
-
-  def __init__(self, seed) -> None:
-      self.g = tf.random.Generator.from_seed(seed)
-
-  def make_initializer(self, initializer_type, **kwargs):
-      if initializer_type not in self._INITIALIZERS:
-        raise ValueError(f"Initializer type {initializer_type} not found.")
-      return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]), **kwargs)
-
-_INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
+_INITIALIZER_FACTORY = determinism.DeterministicInitializerFactory(45245)
 
 
 FILTER_SIZE_MAP = {

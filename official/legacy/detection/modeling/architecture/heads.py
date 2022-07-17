@@ -27,6 +27,9 @@ from official.legacy.detection.modeling.architecture import nn_ops
 from official.legacy.detection.ops import spatial_transform_ops
 
 
+from official.common import determinism
+_INITIALIZER_FACTORY = determinism.DeterministicInitializerFactory(1234)
+
 class RpnHead(tf.keras.layers.Layer):
   """Region Proposal Network head."""
 
@@ -752,7 +755,7 @@ class RetinanetHead(object):
           self._num_classes * self._anchors_per_location,
           kernel_size=(3, 3),
           bias_initializer=tf.constant_initializer(-np.log((1 - 0.01) / 0.01)),
-          kernel_initializer=tf.keras.initializers.RandomNormal(stddev=1e-5),
+          kernel_initializer=_INITIALIZER_FACTORY.make_initializer("normal", stddev=1e-5),
           padding='same',
           name='class-predict')
     self._class_conv = []
@@ -773,8 +776,7 @@ class RetinanetHead(object):
                 self._num_filters,
                 kernel_size=(3, 3),
                 bias_initializer=tf.zeros_initializer(),
-                kernel_initializer=tf.keras.initializers.RandomNormal(
-                    stddev=0.01),
+                kernel_initializer=_INITIALIZER_FACTORY.make_initializer("normal", stddev=0.01),
                 activation=None,
                 padding='same',
                 name='class-' + str(i)))
@@ -796,7 +798,7 @@ class RetinanetHead(object):
           4 * self._anchors_per_location,
           kernel_size=(3, 3),
           bias_initializer=tf.zeros_initializer(),
-          kernel_initializer=tf.keras.initializers.RandomNormal(stddev=1e-5),
+          kernel_initializer=_INITIALIZER_FACTORY.make_initializer("normal", stddev=1e-5),
           padding='same',
           name='box-predict')
     self._box_conv = []
@@ -818,8 +820,7 @@ class RetinanetHead(object):
                 kernel_size=(3, 3),
                 activation=None,
                 bias_initializer=tf.zeros_initializer(),
-                kernel_initializer=tf.keras.initializers.RandomNormal(
-                    stddev=0.01),
+                kernel_initializer=_INITIALIZER_FACTORY.make_initializer("normal", stddev=0.01),
                 padding='same',
                 name='box-' + str(i)))
       for level in range(self._min_level, self._max_level + 1):
