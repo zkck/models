@@ -40,6 +40,8 @@ flags.DEFINE_boolean(name='use_tf_function', default=True,
 flags.DEFINE_boolean(name='single_l2_loss_op', default=False,
                      help='Calculate L2_loss on concatenated weights, '
                      'instead of using Keras per-layer L2 loss.')
+flags.DEFINE_string(name='model', default='resnet',
+                     help='Type of model to use.')
 
 
 def build_stats(runnable, time_callback):

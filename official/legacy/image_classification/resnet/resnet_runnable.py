@@ -14,6 +14,7 @@
 
 """Runs a ResNet model on the ImageNet dataset using custom training loops."""
 
+from official.legacy.image_classification.efficientnet import efficientnet_config, efficientnet_model
 import orbit
 import tensorflow as tf
 from official.legacy.image_classification.resnet import common
@@ -57,9 +58,15 @@ class ResnetRunnable(orbit.StandardTrainer, orbit.StandardEvaluator):
     else:
       self.input_fn = imagenet_preprocessing.input_fn
 
-    self.model = resnet_model.resnet50(
-        num_classes=imagenet_preprocessing.NUM_CLASSES,
-        use_l2_regularizer=not flags_obj.single_l2_loss_op)
+    if self.flags_obj.model == 'resnet':
+      self.model = resnet_model.resnet50(
+          num_classes=imagenet_preprocessing.NUM_CLASSES,
+          use_l2_regularizer=not flags_obj.single_l2_loss_op)
+    elif self.flags_obj.model == 'effnet':
+      self.model = efficientnet_model.efficientnet(
+        tf.keras.layers.Input(shape=(224, 224, 3), batch_size=None),
+        efficientnet_model.ModelConfig(),
+      )
 
     lr_schedule = common.PiecewiseConstantDecayWithWarmup(
         batch_size=flags_obj.batch_size,
