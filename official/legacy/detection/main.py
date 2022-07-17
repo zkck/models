@@ -116,6 +116,7 @@ def run_executor(params,
 
     return dist_executor.train(
         train_input_fn=train_input_fn,
+        train_metric_fn=model_builder.eval_metrics,
         model_dir=params.model_dir,
         iterations_per_loop=params.train.iterations_per_loop,
         total_steps=params.train.total_steps,
