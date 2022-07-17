@@ -18,16 +18,31 @@ spinenet:
 train:
   train_file_pattern: ${TRAIN_FILE_PATTERN?}
 eval:
+  eval_samples: 5000
   val_json_file: ${VAL_JSON_FILE?}
   eval_file_pattern: ${EVAL_FILE_PATTERN?}
 "
 
+# Clear existing directory
+rm -rf "${MODEL_DIR?}"
+
 for i in {1..5}
 do
+  run_dir="${MODEL_DIR?}/run$i"
   python3 main.py \
     --strategy_type=tpu \
     --tpu="local" \
-    --model_dir="${MODEL_DIR?}/run$i" \
+    --model_dir="$run_dir" \
     --mode=train \
     --params_override="${PARAMS?}"
+  python3 main.py \
+    --strategy_type=tpu \
+    --tpu="local" \
+    --model_dir="$run_dir" \
+    --checkpoint_path="$run_dir" \
+    --mode=eval_once \
+    --params_override="${PARAMS?}"
+  # Clear checkpoints
+  echo "Removing checkpoints"
+  python3 clear_checkpoints.py "$run_dir"
 done
