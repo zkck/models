@@ -29,6 +29,14 @@ from keras.layers.preprocessing import image_preprocessing as image_ops
 import tensorflow as tf
 
 
+import os
+_PARALLEL_RANDOMNESS = os.environ.get("ZCK_PARALLEL_RANDOMNESS")
+if _PARALLEL_RANDOMNESS:
+  randomness_func = tf.random.deterministic_uniform
+else:
+  randomness_func = tf.random.uniform
+
+
 # This signifies the max integer that the controller RNN could predict for the
 # augmentation scheme.
 _MAX_LEVEL = 10.
@@ -286,10 +294,10 @@ def cutout(image: tf.Tensor, pad_size: int, replace: int = 0) -> tf.Tensor:
   image_width = tf.shape(image)[1]
 
   # Sample the center location in the image where the zero mask will be applied.
-  cutout_center_height = tf.random.uniform(
+  cutout_center_height = randomness_func(
       shape=[], minval=0, maxval=image_height, dtype=tf.int32)
 
-  cutout_center_width = tf.random.uniform(
+  cutout_center_width = randomness_func(
       shape=[], minval=0, maxval=image_width, dtype=tf.int32)
 
   lower_pad = tf.maximum(0, cutout_center_height - pad_size)
@@ -571,7 +579,7 @@ def unwrap(image: tf.Tensor, replace: int) -> tf.Tensor:
 
 def _randomly_negate_tensor(tensor):
   """With 50% prob turn the tensor negative."""
-  should_flip = tf.cast(tf.floor(tf.random.uniform([]) + 0.5), tf.bool)
+  should_flip = tf.cast(tf.floor(randomness_func([]) + 0.5), tf.bool)
   final_tensor = tf.cond(should_flip, lambda: tensor, lambda: -tensor)
   return final_tensor
 
@@ -619,7 +627,7 @@ def _apply_func_with_prob(func: Any, image: tf.Tensor, args: Any, prob: float):
 
   # Apply the function with probability `prob`.
   should_apply_op = tf.cast(
-      tf.floor(tf.random.uniform([], dtype=tf.float32) + prob), tf.bool)
+      tf.floor(randomness_func([], dtype=tf.float32) + prob), tf.bool)
   augmented_image = tf.cond(should_apply_op, lambda: func(image, *args),
                             lambda: image)
   return augmented_image
@@ -627,7 +635,7 @@ def _apply_func_with_prob(func: Any, image: tf.Tensor, args: Any, prob: float):
 
 def select_and_apply_random_policy(policies: Any, image: tf.Tensor):
   """Select a random policy from `policies` and apply it to `image`."""
-  policy_to_select = tf.random.uniform([], maxval=len(policies), dtype=tf.int32)
+  policy_to_select = randomness_func([], maxval=len(policies), dtype=tf.int32)
   # Note that using tf.case instead of tf.conds would result in significantly
   # larger graphs and would even break export for some larger policies.
   for (i, policy) in enumerate(policies):
@@ -956,13 +964,13 @@ class RandAugment(ImageAugment):
     min_prob, max_prob = 0.2, 0.8
 
     for _ in range(self.num_layers):
-      op_to_select = tf.random.uniform([],
+      op_to_select = randomness_func([],
                                        maxval=len(self.available_ops) + 1,
                                        dtype=tf.int32)
 
       branch_fns = []
       for (i, op_name) in enumerate(self.available_ops):
-        prob = tf.random.uniform([],
+        prob = randomness_func([],
                                  minval=min_prob,
                                  maxval=max_prob,
                                  dtype=tf.float32)
