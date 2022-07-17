@@ -1,0 +1,1 @@
+bash variance.sh baseline
