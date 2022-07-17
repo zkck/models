@@ -4,9 +4,9 @@ def split_uppercase(string):
     i = 0
     for j in range(1, len(string)):
         if string[j].isupper():
-            yield string[i:j]
+            yield string[i:j].lower()
             i = j
-    yield string[i:]
+    yield string[i:].lower()
 
 class RandomNormal(tf.keras.initializers.RandomNormal):
 
