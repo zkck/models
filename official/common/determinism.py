@@ -35,7 +35,11 @@ class VarianceScaling(tf.keras.initializers.VarianceScaling):
       super().__init__(scale=scale, mode=mode, distribution=distribution, seed=seed)
       self._random_generator._force_generator = True
 
+class Dropout(tf.keras.layers.Dropout):
 
+  def __init__(self, rate, noise_shape=None, seed=None, **kwargs):
+      super().__init__(rate, noise_shape=noise_shape, seed=seed, **kwargs)
+      self._random_generator._force_generator = True
 class DeterministicInitializerFactory:
 
   _INITIALIZERS = {
@@ -53,5 +57,8 @@ class DeterministicInitializerFactory:
       if initializer_type not in self._INITIALIZERS:
         raise ValueError(f"Initializer type {initializer_type} not found.")
       return self._INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]), **kwargs)
+
+  def make_dropout(self, rate, noise_shape=None, **kwargs):
+      return Dropout(rate, noise_shape=noise_shape, seed=self.g.uniform_full_int([]), **kwargs)
 
 _INITIALIZER_FACTORY = DeterministicInitializerFactory(66)
