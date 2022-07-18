@@ -64,7 +64,10 @@ class Fpn(object):
       self._conv2d_op = functools.partial(
           tf.keras.layers.SeparableConv2D, depth_multiplier=1)
     else:
-      self._conv2d_op = tf.keras.layers.Conv2D
+      initializer = tf.keras.initializers.GlorotUniform(seed=44)
+      initializer._random_generator._force_generator = True
+      self._conv2d_op = functools.partial(
+          tf.keras.layers.Conv2D, kernel_initializer=initializer)
     if activation == 'relu':
       self._activation_op = tf.nn.relu
     elif activation == 'swish':
