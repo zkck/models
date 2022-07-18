@@ -22,10 +22,13 @@ Residual networks (ResNets) were proposed in:
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from official.common import determinism
 
 import tensorflow as tf
 from official.legacy.detection.modeling.architecture import nn_ops
 
+
+_INITIALIZER_FACTORY = determinism.DeterministicInitializerFactory(45)
 
 # TODO(b/140112644): Refactor the code with Keras style, i.e. build and call.
 class Resnet(object):
@@ -165,7 +168,7 @@ class Resnet(object):
         strides=strides,
         padding=('SAME' if strides == 1 else 'VALID'),
         use_bias=False,
-        kernel_initializer=tf.initializers.VarianceScaling(),
+        kernel_initializer=_INITIALIZER_FACTORY.make_initializer("variance_scaling"),
         data_format=self._data_format)(
             inputs=inputs)
 
