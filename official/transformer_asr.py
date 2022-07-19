@@ -36,7 +36,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='local')
 tf.config.experimental_connect_to_cluster(resolver)
 # This is the TPU initialization code that has to be at the beginning.
 tf.tpu.experimental.initialize_tpu_system(resolver)
