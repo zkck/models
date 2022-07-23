@@ -94,11 +94,11 @@ def preprocess_image(image, is_training):
     #   image = tf.image.random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
     image = tf.image.crop_to_bounding_box(image, 0, 0, HEIGHT, WIDTH)
 
-    # Randomly flip the image horizontally.
-    if _PARALLEL_RANDOMNESS:
-      image = tf.image.deterministic_random_flip_left_right(image)
-    else:
-      image = tf.image.random_flip_left_right(image)
+    # # Randomly flip the image horizontally.
+    # if _PARALLEL_RANDOMNESS:
+    #   image = tf.image.deterministic_random_flip_left_right(image)
+    # else:
+    #   image = tf.image.random_flip_left_right(image)
 
   # Subtract off the mean and divide by the variance of the pixels.
   image = tf.image.per_image_standardization(image)
