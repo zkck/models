@@ -88,10 +88,11 @@ def preprocess_image(image, is_training):
     image = tf.image.resize_with_crop_or_pad(image, HEIGHT + 8, WIDTH + 8)
 
     # Randomly crop a [HEIGHT, WIDTH] section of the image.
-    if _PARALLEL_RANDOMNESS:
-      image = tf.image.deterministic_random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
-    else:
-      image = tf.image.random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
+    # if _PARALLEL_RANDOMNESS:
+    #   image = tf.image.deterministic_random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
+    # else:
+    #   image = tf.image.random_crop(image, [HEIGHT, WIDTH, NUM_CHANNELS])
+    image = tf.image.crop_to_bounding_box(image, 0, 0, HEIGHT, WIDTH)
 
     # Randomly flip the image horizontally.
     if _PARALLEL_RANDOMNESS:
