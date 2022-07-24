@@ -29,11 +29,14 @@ as proposed in the paper, "Attention is All You Need".
 """
 
 
+
 import os
 import random
 from glob import glob
 from official.common import determinism
 import tensorflow as tf
+tf.keras.utils.set_random_seed(1)
+tf.config.experimental.enable_op_determinism()
 from tensorflow import keras
 from tensorflow.keras import layers
 
