@@ -5,14 +5,21 @@ from glob import glob
 import tensorflow as tf
 from tensorflow import keras
 from official.utils.misc.keras_utils import TimeHistory
+from official.common import determinism
 from tensorflow.keras import layers
 
+
+_INITIALIZERS = determinism.DeterministicInitializerFactory(66)
 
 class TokenEmbedding(layers.Layer):
     def __init__(self, num_vocab=1000, maxlen=100, num_hid=64):
         super().__init__()
-        self.emb = tf.keras.layers.Embedding(num_vocab, num_hid)
-        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid)
+        self.emb = tf.keras.layers.Embedding(num_vocab, num_hid,
+            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+        )
+        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid,
+            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+        )
 
     def call(self, x):
         maxlen = tf.shape(x)[-1]
@@ -26,15 +33,20 @@ class SpeechFeatureEmbedding(layers.Layer):
     def __init__(self, num_hid=64, maxlen=100):
         super().__init__()
         self.conv1 = tf.keras.layers.Conv1D(
-            num_hid, 11, strides=2, padding="same", activation="relu"
+            num_hid, 11, strides=2, padding="same", activation="relu",
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
         )
         self.conv2 = tf.keras.layers.Conv1D(
-            num_hid, 11, strides=2, padding="same", activation="relu"
+            num_hid, 11, strides=2, padding="same", activation="relu",
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
         )
         self.conv3 = tf.keras.layers.Conv1D(
-            num_hid, 11, strides=2, padding="same", activation="relu"
+            num_hid, 11, strides=2, padding="same", activation="relu",
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
         )
-        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid)
+        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid,
+            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+        )
 
     def call(self, x):
         x = self.conv1(x)
@@ -50,17 +62,23 @@ class SpeechFeatureEmbedding(layers.Layer):
 class TransformerEncoder(layers.Layer):
     def __init__(self, embed_dim, num_heads, feed_forward_dim, rate=0.1):
         super().__init__()
-        self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim,
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+        )
         self.ffn = keras.Sequential(
             [
-                layers.Dense(feed_forward_dim, activation="relu"),
-                layers.Dense(embed_dim),
+                layers.Dense(feed_forward_dim, activation="relu",
+                    kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+                ),
+                layers.Dense(embed_dim,
+                    kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+                ),
             ]
         )
         self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
-        self.dropout1 = layers.Dropout(rate)
-        self.dropout2 = layers.Dropout(rate)
+        self.dropout1 = layers.Dropout(rate, seed=11)
+        self.dropout2 = layers.Dropout(rate, seed=12)
 
     def call(self, inputs, training):
         attn_output = self.att(inputs, inputs)
@@ -83,16 +101,23 @@ class TransformerDecoder(layers.Layer):
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
         self.layernorm3 = layers.LayerNormalization(epsilon=1e-6)
         self.self_att = layers.MultiHeadAttention(
-            num_heads=num_heads, key_dim=embed_dim
+            num_heads=num_heads, key_dim=embed_dim,
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
         )
-        self.enc_att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
-        self.self_dropout = layers.Dropout(0.5)
-        self.enc_dropout = layers.Dropout(0.1)
-        self.ffn_dropout = layers.Dropout(0.1)
+        self.enc_att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim,
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+        )
+        self.self_dropout = layers.Dropout(0.5, seed=1)
+        self.enc_dropout = layers.Dropout(0.1, seed=2)
+        self.ffn_dropout = layers.Dropout(0.1, seed=3)
         self.ffn = keras.Sequential(
             [
-                layers.Dense(feed_forward_dim, activation="relu"),
-                layers.Dense(embed_dim),
+                layers.Dense(feed_forward_dim, activation="relu",
+                    kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+                ),
+                layers.Dense(embed_dim,
+                    kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+                ),
             ]
         )
 
@@ -175,7 +200,9 @@ class Transformer(keras.Model):
                 TransformerDecoder(num_hid, num_head, num_feed_forward),
             )
 
-        self.classifier = layers.Dense(num_classes)
+        self.classifier = layers.Dense(num_classes,
+            kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
+        )
 
     def decode(self, enc_out, target):
         y = self.dec_input(target)
