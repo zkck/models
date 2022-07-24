@@ -427,7 +427,7 @@ def create_tf_dataset(data, bs=4):
     ds = ds.map(lambda x, y: {"source": x, "target": y})
     ds = ds.batch(bs)
     ds = ds.prefetch(tf.data.AUTOTUNE)
-    return strategy.experimental_distribute_dataset(ds)
+    return ds
 
 
 split = int(len(data) * 0.99)
