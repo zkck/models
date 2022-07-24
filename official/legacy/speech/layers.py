@@ -15,10 +15,10 @@ class TokenEmbedding(layers.Layer):
     def __init__(self, num_vocab=1000, maxlen=100, num_hid=64):
         super().__init__()
         self.emb = tf.keras.layers.Embedding(num_vocab, num_hid,
-            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+            embeddings_initializer=_INITIALIZERS.make_initializer_v2("uniform")
         )
         self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid,
-            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+            embeddings_initializer=_INITIALIZERS.make_initializer_v2("uniform")
         )
 
     def call(self, x):
@@ -45,7 +45,7 @@ class SpeechFeatureEmbedding(layers.Layer):
             kernel_initializer=_INITIALIZERS.make_initializer_v2("glorot_uniform")
         )
         self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=num_hid,
-            embedding_initializer=_INITIALIZERS.make_initializer_v2("uniform")
+            embeddings_initializer=_INITIALIZERS.make_initializer_v2("uniform")
         )
 
     def call(self, x):
