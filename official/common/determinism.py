@@ -70,7 +70,7 @@ class DeterministicInitializerFactory:
 
     def make_initializer_v2(self, initializer_type):
         initializer = self._KERAS_INITIALIZERS[initializer_type](seed=self.g.uniform_full_int([]))
-        initializer._random_generator._force_generator = True
+        # initializer._random_generator._force_generator = True
         return initializer
 
     def make_dropout(self, rate, noise_shape=None, **kwargs):
