@@ -1,4 +1,4 @@
-This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR) while retaining stateful operations.
+This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR) while retaining stateful operations. Our benchmarks consist of two parts: one being the motivation behind PRR, i.e. the slowdown that `enable_op_determinism` may incur, the other being the evaluation of PRR by validating the functionality and measuring performance overhead.
 
 The modifications of the benchmarks include among others:
 
@@ -6,14 +6,34 @@ The modifications of the benchmarks include among others:
 - Scripts for running benchmarks under `benchmark_scripts/`
 - Modifications to include heavier input pipelines
 - Conditional statements in the input pipeline for use PRR
-- Changes for dataset compatibility
+- Changes for compatibility with datasets
+
+The models/datasets that we use in our motivation for analyzing performance overhead of `enable_op_determinism` are as follows, each found in `benchmark_scripts/` (see branches below):
+
+| Model | Dataset |
+| ------ | ----------- |
+| ResNet50 | ImageNet |
+| ResNet50 | CIFAR10 |
+| EfficientNet | ImageNet |
+| EfficientNet | CIFAR10 |
+| RetinaNet | COCO |
+| Transformer | LJSpeech (+ SpecAugment) |
+| Transformer | LibriSpeech (+ SpecAugment) |
+
+The models/datasets that we use in our evaluation are as follows:
+
+| Model | Dataset |
+| ------ | ----------- |
+| ResNet50 | ImageNet |
+| ResNet52 | CIFAR10 |
+| EfficientNet | ImageNet |
+| RetinaNet | COCO |
 
 There are many branches in this repository, most of which were used for debugging. The following table lists the main branches used for benchmarking, and a description describing what purpose they served in the evaluation of PRR.
 
 | Branch | Description |
 | ------ | ----------- |
-| zacook/accuracy
-zacook/motivation | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
+| zacook/accuracy<br />zacook/motivation | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
 | zacook/deterministic-weights | Branch used for testing PRR, requiring removing all sources of non-determinism except for those due to parallelism with stateful operations |
 
 From this line onwards is the original README.
