@@ -1,5 +1,7 @@
 This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR) while retaining stateful operations. Our benchmarks consist of two parts: one being the motivation behind PRR, i.e. the slowdown that `enable_op_determinism` may incur, the other being the evaluation of PRR by validating the functionality and measuring performance overhead.
 
+For technical setup, we used TPU VMs and datasets on attached SSD mounted at `~/training-data/`.
+
 The modifications of the benchmarks include among others:
 
 - Changing weight initialization to deterministic behaviors
@@ -7,6 +9,7 @@ The modifications of the benchmarks include among others:
 - Modifications to include heavier input pipelines
 - Conditional statements in the input pipeline for use PRR
 - Changes for compatibility with datasets
+- Saving additional run statistics
 
 The models/datasets that we use in our motivation for analyzing performance overhead of `enable_op_determinism` are as follows, each found in `benchmark_scripts/` (see branches below):
 
@@ -33,8 +36,10 @@ There are many branches in this repository, most of which were used for debuggin
 
 | Branch | Description |
 | ------ | ----------- |
-| zacook/accuracy<br />zacook/motivation | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
+| zacook/motivation<br />zacook/accuracy | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
 | zacook/deterministic-weights | Branch used for testing PRR, requiring removing all sources of non-determinism except for those due to parallelism with stateful operations |
+
+To run the benchmarking scripts, make sure that datasets are mounted in `~/training-data/` and that the Model Garden codebase is installed with `PYTHONPATH=/path/to/models`, and run the benchmark script from the root of this codebase.
 
 From this line onwards is the original README.
 
