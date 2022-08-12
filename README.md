@@ -1,15 +1,20 @@
-This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR), and allowing to retain stateful operations.
+This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR) while retaining stateful operations.
 
-The modifications of the benchmarks include (and are not limited to):
+The modifications of the benchmarks include among others:
 
--
+- Changing weight initialization to deterministic behaviors
+- Scripts for running benchmarks under `benchmark_scripts/`
+- Modifications to include heavier input pipelines
+- Conditional statements in the input pipeline for use PRR
+- Changes for dataset compatibility
 
-The following table lists the main branches used for testing, and a description describing what purpose they served in the evaluation.
+There are many branches in this repository, most of which were used for debugging. The following table lists the main branches used for benchmarking, and a description describing what purpose they served in the evaluation of PRR.
 
 | Branch | Description |
 | ------ | ----------- |
-| zacook/accuracy |  |
-| zacook/deterministic-weights |  |
+| zacook/accuracy
+zacook/motivation | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
+| zacook/deterministic-weights | Branch used for testing PRR, requiring removing all sources of non-determinism except for those due to parallelism with stateful operations |
 
 From this line onwards is the original README.
 
