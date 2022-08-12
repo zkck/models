@@ -1,3 +1,18 @@
+This repository contains modified ML training pipeline benchmarks for evaluating the implementation of [per-element seeds in TensorFlow](http://hdl.handle.net/20.500.11850/525189), a solution for providing parallel reproducible randomness (PRR), and allowing to retain stateful operations.
+
+The modifications of the benchmarks include (and are not limited to):
+
+-
+
+The following table lists the main branches used for testing, and a description describing what purpose they served in the evaluation.
+
+| Branch | Description |
+| ------ | ----------- |
+| zacook/accuracy |  |
+| zacook/deterministic-weights |  |
+
+From this line onwards is the original README.
+
 ![Logo](https://storage.googleapis.com/model_garden_artifacts/TF_Model_Garden.png)
 
 # Welcome to the Model Garden for TensorFlow
