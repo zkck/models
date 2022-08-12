@@ -39,7 +39,7 @@ There are many branches in this repository, most of which were used for debuggin
 | zacook/motivation<br />zacook/accuracy | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
 | zacook/deterministic-weights | Branch used for testing PRR, requiring removing all sources of non-determinism except for those due to parallelism with stateful operations |
 
-To run the benchmarking scripts, make sure that datasets are mounted in `~/training-data/` and that the Model Garden codebase is installed with `PYTHONPATH=/path/to/models`, and run the benchmark script from the root of this codebase.
+To run a benchmark in `benchmark_scripts`, make sure that datasets are mounted in `~/training-data/` and that the Model Garden codebase is installed with `PYTHONPATH=/path/to/models`, and run the benchmark script from the root of this codebase.
 
 From this line onwards is the original README.
 
