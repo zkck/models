@@ -39,7 +39,41 @@ There are many branches in this repository, most of which were used for debuggin
 | zacook/motivation<br />zacook/accuracy | Branches used for evaluating the overhead of `enable_op_determinism`, with scripts located in `benchmark_scripts/` |
 | zacook/deterministic-weights | Branch used for testing PRR, requiring removing all sources of non-determinism except for those due to parallelism with stateful operations |
 
-To run a benchmark in `benchmark_scripts`, make sure that datasets are mounted in `~/training-data/` and that the Model Garden codebase is installed with `PYTHONPATH=/path/to/models`, and run the benchmark script from the root of this codebase.
+To run a benchmark in `benchmark_scripts`, make sure that datasets are mounted in `~/training-data/` and that the Model Garden codebase is installed with `PYTHONPATH=/path/to/models`, and run the benchmark script from the root of this codebase. The layout of the training data directory should be as follows:
+
+```
+zacook@zacook-instance-1:~$ tree training-data/ -d --filelimit 100
+training-data/
+├── cache_temp
+├── cifar10
+│   └── 3.0.2
+├── coco
+│   └── raw-data
+│       ├── annotations
+│       ├── test2017
+│       ├── train2017
+│       └── val2017
+├── imagenet-tiny
+│   ├── tfrecords
+│   │   ├── train
+│   │   └── validation
+│   └── tiny-imagenet-200
+│       ├── test
+│       │   └── images
+│       ├── train [200 entries exceeds filelimit, not opening dir]
+│       └── validation
+│           └── images
+├── imagenet2012
+│   ├── ILSVRC2012_devkit_t12
+│   │   ├── data
+│   │   └── evaluation
+│   ├── tfrecords
+│   │   ├── train
+│   │   └── validation
+│   ├── train [1000 entries exceeds filelimit, not opening dir]
+│   └── val [1000 entries exceeds filelimit, not opening dir]
+...
+```
 
 From this line onwards is the original README.
 
